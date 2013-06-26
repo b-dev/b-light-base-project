@@ -1,0 +1,6 @@
+-r common.txt
+
+Sphinx==1.1.2
+django-debug-toolbar
+Werkzeug
+django-extensions
