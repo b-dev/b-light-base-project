@@ -6,7 +6,6 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO_NAME = os.path.basename(REPO_ROOT)
 
 if __name__ == '__main__':
-
     if len(sys.argv) < 1:
         print "Must give environment label"
         sys.exit()
@@ -44,24 +43,14 @@ if __name__ == '__main__':
                        ])
     env_file.close()
 
-    #import distutils;
-    #print(distutils.sysconfig.get_python_lib())
-
-
-
-    # vhd = os.environ['VIRTUALENVWRAPPER_HOOK_DIR']
-    # pah = os.path.join(vhd, PRJ_NAME, 'bin', 'postactivate')
-    # post_activate_hook = open(pah, 'r+')
-    # lines = post_activate_hook.readlines()
-    # for line in lines: pass
-    # post_activate_hook.writelines(['export PRJ_ENV=%s\n' % PRJ_ENV,
-    #                                'export DJANGO_SETTINGS_MODULE=settings.%s\n' % PRJ_ENV,
-    #                                'export PRJ_NAME=%s\n' % PRJ_NAME,
-    #                                'export PRJ_DB=%s\n' % PRJ_DB    ,
-    #                                'export PRJ_USER=%s\n' % PRJ_USER,
-    #                                'export PRJ_PASS=%s\n' % PRJ_PASS,
-    #                                'export PRJ_SECRET_KEY="%s\n"' % "".join([random.choice(
-    #                                    "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_+)") for i in range(50)]),
-    #                                ])
-    # post_activate_hook.flush()
-    # post_activate_hook.close()
+    # add2virtualenv
+    import distutils
+    SITE_PACKAGES_DIR = distutils.sysconfig.get_python_lib()
+    file_pth_path = os.path.join(SITE_PACKAGES_DIR, '_virtualenv_path_extensions.pth')
+    file_pth = open(file_pth_path, 'w')
+    file_pth.writelines([
+        "import sys; sys.__plen = len(sys.path)\n",
+        "%s\n" % os.path.abspath('website'),
+        "%s\n" % os.path.abspath('external_apps'),
+        "import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)"
+    ])

@@ -17,14 +17,17 @@ ENVIRONMENTS = {
     'production': ['placehold-production'],
 }
 
+@task
 def dev():
     env.name = 'dev'
     env.hosts = ENVIRONMENTS[env.name]
 
+@task
 def staging():
     env.name = 'staging'
     env.hosts = ENVIRONMENTS[env.name]
 
+@task
 def production():
     env.name = 'production'
     env.hosts = ENVIRONMENTS[env.name]
