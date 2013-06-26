@@ -17,9 +17,24 @@ ENVIRONMENTS = {
     'production': ['placehold-production'],
 }
 
+def dev():
+    env.name = 'dev'
+    env.hosts = ENVIRONMENTS[env.name]
+
+def staging():
+    env.name = 'staging'
+    env.hosts = ENVIRONMENTS[env.name]
+
+def production():
+    env.name = 'production'
+    env.hosts = ENVIRONMENTS[env.name]
 
 @task
 def configure_db():
+    if env.name == 'dev':
+        # TODO
+        return
+
     require.postgres.server()
     require.postgres.user(PRJ_USER, PRJ_PASS)
     require.postgres.database(PRJ_DB, PRJ_USER)

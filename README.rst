@@ -7,7 +7,7 @@ A project template for Django 1.5.
 To use this project follow these steps:
 
 #. Create your working environment
-#. Install Django
+#. Download b-light-base-project from github
 #. Create the new project using the django-two-scoops template
 #. Install additional dependencies
 #. Use the Django admin to create the project
@@ -64,20 +64,23 @@ virtualenvwrapper):
     /home/<youruser>/icecream/icecream/
     import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)
 
-Installing Django
-=================
+Download b-light-base-project from github
+==========================================
 
-To install Django in the new virtual environment, run the following command::
+Download b-light-base-project from github::
 
-    $ pip install django
+    $ git clone git@github.com:marcominutoli/b-light-base-project.git icecream
 
 Creating your project
 =====================
 
-To create a new Django project called '**icecream**' using
-django-twoscoops-project, run the following command::
+1. Enter in icecream directory::
 
-    $ django-admin.py startproject --template=https://github.com/twoscoops/django-twoscoops-project/archive/master.zip --extension=py,rst,html icecream
+    $ cd icecream
+
+2. Install the project
+
+    $ make install ENV=dev
 
 Installation of Dependencies
 =============================

@@ -31,28 +31,37 @@ if __name__ == '__main__':
     if len(PRJ_PASS.strip()) == 0:
         PRJ_PASS = PRJ_USER
 
-    # os.environ['PRJ_ENV'] = PRJ_ENV
-    # os.environ['DJANGO_SETTINGS_MODULE'] = PRJ_ENV
-    # os.environ['PRJ_NAME'] = PRJ_NAME
-    # os.environ['PRJ_DB'] = PRJ_DB
-    # os.environ['PRJ_USER'] = PRJ_USER
-    # os.environ['PRJ_PASS'] = PRJ_PASS
-    # os.environ['PRJ_SECRET_KEY'] = "".join([random.choice(
-    #     "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)])
-    #vhd = os.environ['VIRTUALENVWRAPPER_HOOK_DIR']
-
     env_path_file = os.path.join(REPO_ROOT, '.env')
     env_file = open(env_path_file, 'w')
-    #lines = post_activate_hook.readlines()
-    #for line in lines: pass
+
     env_file.writelines(['PRJ_ENV=%s\n' % PRJ_ENV,
                          'PRJ_NAME=%s\n' % PRJ_NAME,
                          'PRJ_DB=%s\n' % PRJ_DB    ,
                          'PRJ_USER=%s\n' % PRJ_USER,
                          'PRJ_PASS=%s\n' % PRJ_PASS,
-                         'PRJ_SECRET_KEY="%s\n"' % "".join([random.choice(
+                         'PRJ_SECRET_KEY="%s"' % "".join([random.choice(
                              "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_+)") for i in range(50)]),
                        ])
     env_file.close()
-    #post_activate_hook.flush()
-    #post_activate_hook.close()
+
+    #import distutils;
+    #print(distutils.sysconfig.get_python_lib())
+
+
+
+    # vhd = os.environ['VIRTUALENVWRAPPER_HOOK_DIR']
+    # pah = os.path.join(vhd, PRJ_NAME, 'bin', 'postactivate')
+    # post_activate_hook = open(pah, 'r+')
+    # lines = post_activate_hook.readlines()
+    # for line in lines: pass
+    # post_activate_hook.writelines(['export PRJ_ENV=%s\n' % PRJ_ENV,
+    #                                'export DJANGO_SETTINGS_MODULE=settings.%s\n' % PRJ_ENV,
+    #                                'export PRJ_NAME=%s\n' % PRJ_NAME,
+    #                                'export PRJ_DB=%s\n' % PRJ_DB    ,
+    #                                'export PRJ_USER=%s\n' % PRJ_USER,
+    #                                'export PRJ_PASS=%s\n' % PRJ_PASS,
+    #                                'export PRJ_SECRET_KEY="%s\n"' % "".join([random.choice(
+    #                                    "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_+)") for i in range(50)]),
+    #                                ])
+    # post_activate_hook.flush()
+    # post_activate_hook.close()
