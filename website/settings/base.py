@@ -1,15 +1,16 @@
 """Common settings and globals."""
+from os import environ
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
 
 ugettext = lambda s: s
 
-PRJ_ENV = os.environ['PRJ_ENV']
-PRJ_NAME = os.environ['PRJ_NAME']
-PRJ_DB = os.environ['PRJ_DB']
-PRJ_USER = os.environ['PRJ_USER']
-PRJ_PASS = os.environ['PRJ_PASS']
-PRJ_SECRET_KEY = os.environ['PRJ_SECRET_KEY']
+PRJ_ENV = environ['PRJ_ENV']
+PRJ_NAME = environ['PRJ_NAME']
+PRJ_DB = environ['PRJ_DB']
+PRJ_USER = environ['PRJ_USER']
+PRJ_PASS = environ['PRJ_PASS']
+PRJ_SECRET_KEY = environ['PRJ_SECRET_KEY']
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
