@@ -1,8 +1,14 @@
-import os, sh
+import os
+from os.path import abspath, dirname
+
 from fabric.api import *
 from fabtools import require
 import fabtools
 
+SITE_ROOT = dirname(abspath(__file__))
+
+from _set_local_env_vars import import_env_vars
+import_env_vars(SITE_ROOT)
 
 PRJ_ENV = os.environ['PRJ_ENV']
 PRJ_NAME = os.environ['PRJ_NAME']

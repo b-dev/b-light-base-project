@@ -5,12 +5,6 @@ from sys import path
 
 ugettext = lambda s: s
 
-PRJ_ENV = environ['PRJ_ENV']
-PRJ_NAME = environ['PRJ_NAME']
-PRJ_DB = environ['PRJ_DB']
-PRJ_USER = environ['PRJ_USER']
-PRJ_PASS = environ['PRJ_PASS']
-PRJ_SECRET_KEY = environ['PRJ_SECRET_KEY']
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
@@ -18,6 +12,16 @@ DJANGO_ROOT = dirname(dirname(abspath(__file__)))
 
 # Absolute filesystem path to the top-level project folder:
 SITE_ROOT = dirname(DJANGO_ROOT)
+
+from _set_local_env_vars import import_env_vars
+import_env_vars(SITE_ROOT)
+
+PRJ_ENV = environ['PRJ_ENV']
+PRJ_NAME = environ['PRJ_NAME']
+PRJ_DB = environ['PRJ_DB']
+PRJ_USER = environ['PRJ_USER']
+PRJ_PASS = environ['PRJ_PASS']
+PRJ_SECRET_KEY = environ['PRJ_SECRET_KEY']
 
 # Site name:
 SITE_NAME = basename(DJANGO_ROOT)
