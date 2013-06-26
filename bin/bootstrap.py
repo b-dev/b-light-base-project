@@ -52,5 +52,6 @@ if __name__ == '__main__':
         "import sys; sys.__plen = len(sys.path)\n",
         "%s\n" % os.path.abspath('website'),
         "%s\n" % os.path.abspath('external_apps'),
+        "%s\n" % os.path.abspath('.'),
         "import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)"
     ])
