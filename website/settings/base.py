@@ -24,11 +24,7 @@ PRJ_PASS = environ['PRJ_PASS']
 PRJ_SECRET_KEY = environ['PRJ_SECRET_KEY']
 
 # Site name:
-SITE_NAME = basename(DJANGO_ROOT)
-
-# Add our project to our pythonpath, this way we don't need to type our project
-# name in our dotted import paths:
-path.append(DJANGO_ROOT)
+SITE_NAME = basename(SITE_ROOT)
 ########## END PATH CONFIGURATION
 
 
@@ -183,7 +179,7 @@ MIDDLEWARE_CLASSES = (
 
 ########## URL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
-ROOT_URLCONF = '%s.urls' % SITE_NAME
+ROOT_URLCONF = 'website.urls'
 ########## END URL CONFIGURATION
 
 
