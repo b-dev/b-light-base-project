@@ -18,6 +18,7 @@ import_env_vars(SITE_ROOT)
 
 PRJ_ENV = environ['PRJ_ENV']
 PRJ_NAME = environ['PRJ_NAME']
+PRJ_ENGINE = environ['PRJ_ENGINE']
 PRJ_DB = environ['PRJ_DB']
 PRJ_USER = environ['PRJ_USER']
 PRJ_PASS = environ['PRJ_PASS']
@@ -51,12 +52,16 @@ MANAGERS = ADMINS
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
+if PRJ_ENGINE == 'sqlite3':
+    dbname = normpath(join(DJANGO_ROOT, 'default.db'))
+else:
+    dbname = PRJ_DB
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
+        'ENGINE': 'django.db.backends.%s' % PRJ_ENGINE,
+        'NAME': dbname,
+        'USER': PRJ_USER,
+        'PASSWORD': PRJ_PASS,
         'HOST': '',
         'PORT': '',
     }

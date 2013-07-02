@@ -1,3 +1,5 @@
 skip Vagrant provision if .skip file present
 requirements for db based on the value of PRJ_ENGINE
 generate correct locale based on machine locale (default) or command arg
+add integration to jenkins
+find a box with guest additions for 4.2

@@ -56,12 +56,13 @@ cp -p $PROJECT_DIR/etc/install/bashrc /home/django/.bashrc
 su - django -c "mkdir -p /home/django/.pip_download_cache"
 
 # Postgresql setup for project
-createdb -Upostgres $PRJ_DB
+createuser -Upostgres -d -R -S $PRJ_USER
+createdb -Upostgres -O$PRJ_USER $PRJ_DB
 
 # Virtualenv setup for project
 su - django -c "/usr/local/bin/virtualenv $VIRTUALENV_DIR && \
     echo $PROJECT_DIR > $VIRTUALENV_DIR/.project && \
-    PIP_DOWNLOAD_CACHE=/home/django/.pip_download_cache $VIRTUALENV_DIR/bin/pip install -r $PROJECT_DIR/$PRJ_ENV.txt"
+    PIP_DOWNLOAD_CACHE=/home/django/.pip_download_cache $VIRTUALENV_DIR/bin/pip install -r $PROJECT_DIR/requirements/$PRJ_ENV.txt"
 
 echo "workon $PRJ_NAME" >> /home/django/.bashrc
 
