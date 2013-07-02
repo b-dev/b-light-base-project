@@ -3,14 +3,7 @@
 # Script to set up a Django project on Vagrant.
 
 # Installation settings
-
-PRJ_NAME=$1
-PRJ_ENV=$2
-PRJ_ENGINE=$3
-PRJ_DB=$4
-PRJ_USER=$5
-PRJ_PASS=$6
-
+source /vagrant/.env
 PGSQL_VERSION=9.1
 PROJECT_DIR=/vagrant
 VIRTUALENV_DIR=/home/django/.virtualenvs/$PRJ_NAME
