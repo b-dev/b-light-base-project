@@ -5,27 +5,24 @@
 # Installation settings
 
 PRJ_NAME=$1
-PRJ_ENV=dev
-PRJ_ENGINE=postgresql_psycopg2
-PRJ_DB=pbx
-PRJ_USER=pbx
-PRJ_PASS=pbx
+PRJ_ENV=$2
+PRJ_ENGINE=$3
+PRJ_DB=$4
+PRJ_USER=$5
+PRJ_PASS=$6
 
-DB_NAME=$PRJ_NAME
-VIRTUALENV_NAME=$PRJ_NAME
-
-useradd -d /home/django -m -r -p `openssl passwd django` -s /bin/bash django
-
+PGSQL_VERSION=9.1
 PROJECT_DIR=/vagrant
 VIRTUALENV_DIR=/home/django/.virtualenvs/$PRJ_NAME
 
-PGSQL_VERSION=9.1
+
+# Add a user 'django' with password 'django' to host the virtualenv
+useradd -d /home/django -m -r -p `openssl passwd django` -s /bin/bash django
 
 # Need to fix locale so that Postgres creates databases in UTF-8
 cp -p $PROJECT_DIR/etc/install/etc-bash.bashrc /etc/bash.bashrc
 locale-gen en_GB.UTF-8
 dpkg-reconfigure locales
-
 export LANGUAGE=en_GB.UTF-8
 export LANG=en_GB.UTF-8
 export LC_ALL=en_GB.UTF-8
@@ -46,7 +43,7 @@ if ! command -v psql; then
     /etc/init.d/postgresql reload
 fi
 
-# virtualenv global setup
+# Virtualenv global setup
 if ! command -v pip; then
     easy_install -U pip
 fi
@@ -54,24 +51,24 @@ if [[ ! -f /usr/local/bin/virtualenv ]]; then
     easy_install virtualenv virtualenvwrapper stevedore virtualenv-clone
 fi
 
-# bash environment global setup
+# Bash environment global setup
 cp -p $PROJECT_DIR/etc/install/bashrc /home/django/.bashrc
 su - django -c "mkdir -p /home/django/.pip_download_cache"
 
-# postgresql setup for project
-createdb -Upostgres $DB_NAME
+# Postgresql setup for project
+createdb -Upostgres $PRJ_DB
 
-# virtualenv setup for project
+# Virtualenv setup for project
 su - django -c "/usr/local/bin/virtualenv $VIRTUALENV_DIR && \
     echo $PROJECT_DIR > $VIRTUALENV_DIR/.project && \
-    PIP_DOWNLOAD_CACHE=/home/django/.pip_download_cache $VIRTUALENV_DIR/bin/pip install -r $PROJECT_DIR/requirements.txt"
+    PIP_DOWNLOAD_CACHE=/home/django/.pip_download_cache $VIRTUALENV_DIR/bin/pip install -r $PROJECT_DIR/$PRJ_ENV.txt"
 
-echo "workon $VIRTUALENV_NAME" >> /home/django/.bashrc
+echo "workon $PRJ_NAME" >> /home/django/.bashrc
 
 # Set execute permissions on manage.py, as they get lost if we build from a zip file
 chmod a+x $PROJECT_DIR/website/manage.py
 
 # Django project setup
-su - django -c "source /usr/local/bin/virtualenvwrapper.sh && workon $VIRTUALENV_NAME && add2virtualenv /vagrant/website/"
-su - django -c "source /usr/local/bin/virtualenvwrapper.sh && workon $VIRTUALENV_NAME && add2virtualenv /vagrant/"
+su - django -c "source /usr/local/bin/virtualenvwrapper.sh && workon $PRJ_NAME && add2virtualenv /vagrant/website/"
+su - django -c "source /usr/local/bin/virtualenvwrapper.sh && workon $PRJ_NAME && add2virtualenv /vagrant/"
 su - django -c "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && python website/manage.py syncdb --all --noinput && python website/manage.py migrate --fake"

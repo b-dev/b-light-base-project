@@ -1,2 +1,3 @@
-
+skip Vagrant provision if .skip file present
 requirements for db based on the value of PRJ_ENGINE
+generate correct locale based on machine locale (default) or command arg

@@ -3,8 +3,10 @@
 
 Vagrant::Config.run do |config|
 	# Base box to build off, and download URL for when it doesn't exist on the user's system already
-	config.vm.box = "precise32"
-	config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+	# config.vm.box = "precise32"
+	# config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+	config.vm.box = "ubuntu_cloud_64"
+	config.vm.box_url = "http://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-vagrant-amd64-disk1.box"
 
 	# Boot with a GUI so you can see the screen. (Default is headless)
 	# config.vm.boot_mode = :gui
