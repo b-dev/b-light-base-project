@@ -54,13 +54,13 @@ if __name__ == '__main__':
     env_path_file = os.path.join(REPO_ROOT, '.env')
     env_file = open(env_path_file, 'w')
 
-    env_file.writelines(['PRJ_ENV=%s\n' % PRJ_ENV,
-                         'PRJ_NAME=%s\n' % PRJ_NAME,
-                         'PRJ_ENGINE=%s\n' % 'postgresql_psycopg2',
-                         'PRJ_DB=%s\n' % PRJ_DB    ,
-                         'PRJ_USER=%s\n' % PRJ_USER,
-                         'PRJ_PASS=%s\n' % PRJ_PASS,
-                         'PRJ_SECRET_KEY="%s"' % "".join([random.choice(
+    env_file.writelines(['export PRJ_ENV=%s\n' % PRJ_ENV,
+                         'export PRJ_NAME=%s\n' % PRJ_NAME,
+                         'export PRJ_ENGINE=%s\n' % 'postgresql_psycopg2',
+                         'export PRJ_DB=%s\n' % PRJ_DB    ,
+                         'export PRJ_USER=%s\n' % PRJ_USER,
+                         'export PRJ_PASS=%s\n' % PRJ_PASS,
+                         'export PRJ_SECRET_KEY="%s"' % "".join([random.choice(
                              "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_+)") for i in range(50)]),
                        ])
     env_file.close()

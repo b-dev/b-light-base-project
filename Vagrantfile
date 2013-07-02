@@ -21,9 +21,10 @@ Vagrant::Config.run do |config|
 
 	# Share an additional folder to the guest VM. The first argument is
 	# an identifier, the second is the path on the guest to mount the
-	# folder, and the third is the path on the host to the actual folde#r.
+	# folder, and the third is the path on the host to the actual folder.
 	#config.vm.share_folder "pbx", "/home/django/pbx", "."
 
 	# Enable provisioning with a shell script.
-	config.vm.provision :shell, :path => "etc/install/install.sh", :args => "PRJ_NAME PRJ_ENV PRJ_ENGINE PRJ_DB PRJ_USER PRJ_PASS"
+	config.vm.provision :shell, :path => "etc/install/install.sh"
+	#, :args => "PRJ_ENV PRJ_NAME ..."
 end
