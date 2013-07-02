@@ -21,6 +21,7 @@ ENVIRONMENTS = {
     'dev': ['127.0.0.1'],
     'staging': ['placehold-staging'],
     'production': ['placehold-production'],
+    'test': ['placehold-test'],
 }
 
 @task
@@ -39,14 +40,21 @@ def production():
     env.hosts = ENVIRONMENTS[env.name]
 
 @task
+def test():
+    env.name = 'production'
+    env.hosts = ENVIRONMENTS[env.name]
+
+@task
 def configure_db():
     if env.name == 'dev':
-        # TODO
-        return
-
-    require.postgres.server()
-    require.postgres.user(PRJ_USER, PRJ_PASS)
-    require.postgres.database(PRJ_DB, PRJ_USER)
+        from sh import createuser, createdb
+        #todo untested
+        createuser("-Upostgres -d -R -S %s" % PRJ_USER)
+        createdb ("-Upostgres -O%s %s" % PRJ_USER, PRJ_DB)
+    else:
+        require.postgres.server()
+        require.postgres.user(PRJ_USER, PRJ_PASS)
+        require.postgres.database(PRJ_DB, PRJ_USER)
 
 @task
 def configure_git():
@@ -65,6 +73,18 @@ def configure_git():
 @task
 def setup():
     configure_db()
+
+@task
+def add_webapp():
+    from sh import pip
+    for line in pip.install('-r%s/requirements/webapp.txt' % SITE_ROOT, _iter=True):
+        print line
+
+    pah = os.path.join(SITE_ROOT, '.env')
+    with open(pah, 'r+') as envfile:
+        lines = envfile.readlines()
+        for line in lines: pass #todo "search and replace or append" instead of just appending
+        envfile.writelines(['export PRJ_IS_WEBAPP=TRUE', ])
 
 
 ################
@@ -96,17 +116,6 @@ def setup():
 #             except ValueError:
 #                 local('ssh -A %s@%s "%s"' % (env.user, h, cmd), capture=capture)
 #
-# def dev():
-#     env.name = 'dev'
-#     env.hosts = ENVIRONMENTS[env.name]
-#
-# def staging():
-#     env.name = 'staging'
-#     env.hosts = ENVIRONMENTS[env.name]
-#
-# def production():
-#     env.name = 'production'
-#     env.hosts = ENVIRONMENTS[env.name]
 #
 # def update():
 #     # Clono, se non e' gia stato clonato il progetto

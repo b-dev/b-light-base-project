@@ -220,6 +220,9 @@ LOCAL_APPS = (
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+if environ.get('PRJ_IS_WEBAPP', '') == 'TRUE':
+    from .webapp import *
 ########## END APP CONFIGURATION
 
 

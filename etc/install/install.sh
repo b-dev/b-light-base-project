@@ -11,6 +11,7 @@ VIRTUALENV_DIR=/home/django/.virtualenvs/$PRJ_NAME
 
 # Add a user 'django' with password 'django' to host the virtualenv
 useradd -d /home/django -m -r -p `openssl passwd django` -s /bin/bash django
+usermod -a -G vagrant django
 
 # Need to fix locale so that Postgres creates databases in UTF-8
 cp -p $PROJECT_DIR/etc/install/etc-bash.bashrc /etc/bash.bashrc
@@ -22,6 +23,7 @@ export LC_ALL=en_GB.UTF-8
 
 # Install essential packages from Apt
 apt-get update -y
+apt-get upgrade -y
 # Python dev packages
 apt-get install -y build-essential python python-dev python-setuptools python-pip
 # Dependencies for image processing with PIL

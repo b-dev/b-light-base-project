@@ -42,7 +42,8 @@ If using Vagrant:
     cd ..
     vagrant up
 
-This initialize a virtual machine with a user 'django' (password 'django') providing a virtualenv connected to the project
+This initialize a virtual machine with a user 'django' (password 'django') providing a virtualenv connected to the project.
+Debian packages are kept upgraded by the provisioning.
 
 If not using Vagrant:
 ---------------------
