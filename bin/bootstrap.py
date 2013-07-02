@@ -1,11 +1,26 @@
-import sys, os
+import sys
+import os
 import random
 import getpass
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO_NAME = os.path.basename(REPO_ROOT)
 
+def _replace_in_vagrant_file(prj_root, dict):
+    fpath = prj_root+"/Vagrantfile"
+    with open(fpath) as f:
+        s = f.read()
+    s = s.replace('PRJ_NAME', dict['PRJ_NAME'])
+    s = s.replace('PRJ_ENV', dict['PRJ_ENV'])
+    s = s.replace('PRJ_ENGINE', dict['PRJ_ENGINE'])
+    s = s.replace('PRJ_DB', dict['PRJ_DB'])
+    s = s.replace('PRJ_USER', dict['PRJ_USER'])
+    s = s.replace('PRJ_PASS', dict['PRJ_PASS'])
+    with open(fpath, 'w') as f:
+        f.write(s)
+
 if __name__ == '__main__':
+
     if len(sys.argv) < 1:
         print "Must give environment label"
         sys.exit()
@@ -13,10 +28,6 @@ if __name__ == '__main__':
     PRJ_ENV = sys.argv[1]
     PRJ_NAME = REPO_NAME
     PRJ_ROOT = REPO_ROOT.replace(REPO_NAME, PRJ_NAME)
-
-    from sh import pip
-    for line in pip.install('-r%s/requirements/%s.txt' % (PRJ_ROOT, PRJ_ENV), _iter=True):
-        print line
 
     PRJ_DB = raw_input(u"db name for the project db ? (defaults to project name) \n")
     if len(PRJ_DB.strip()) == 0:
@@ -30,11 +41,22 @@ if __name__ == '__main__':
     if len(PRJ_PASS.strip()) == 0:
         PRJ_PASS = PRJ_USER
 
+    _replace_in_vagrant_file(PRJ_ROOT,
+                             {
+                                 'PRJ_NAME' : PRJ_NAME,
+                                 'PRJ_ENV' : PRJ_ENV,
+                                 'PRJ_ENGINE' : 'postgresql_psycopg2',
+                                 'PRJ_DB' : PRJ_DB,
+                                 'PRJ_USER' : PRJ_USER,
+                                 'PRJ_PASS' : PRJ_PASS
+                             })
+
     env_path_file = os.path.join(REPO_ROOT, '.env')
     env_file = open(env_path_file, 'w')
 
     env_file.writelines(['PRJ_ENV=%s\n' % PRJ_ENV,
                          'PRJ_NAME=%s\n' % PRJ_NAME,
+                         'PRJ_ENGINE=%s\n' % 'postgresql_psycopg2',
                          'PRJ_DB=%s\n' % PRJ_DB    ,
                          'PRJ_USER=%s\n' % PRJ_USER,
                          'PRJ_PASS=%s\n' % PRJ_PASS,
@@ -42,16 +64,3 @@ if __name__ == '__main__':
                              "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_+)") for i in range(50)]),
                        ])
     env_file.close()
-
-    # add2virtualenv
-    import distutils
-    SITE_PACKAGES_DIR = distutils.sysconfig.get_python_lib()
-    file_pth_path = os.path.join(SITE_PACKAGES_DIR, '_virtualenv_path_extensions.pth')
-    file_pth = open(file_pth_path, 'w')
-    file_pth.writelines([
-        "import sys; sys.__plen = len(sys.path)\n",
-        "%s\n" % os.path.abspath('website'),
-        "%s\n" % os.path.abspath('external_apps'),
-        "%s\n" % os.path.abspath('.'),
-        "import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)"
-    ])
