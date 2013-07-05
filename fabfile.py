@@ -1,11 +1,13 @@
-import os
+import os, time, random
 from os.path import abspath, dirname
 
 from fabric.api import *
+from fabric.contrib.files import append, exists
 from fabtools import require
 import fabtools
 
 SITE_ROOT = dirname(abspath(__file__))
+GIT_REPO = 'GIT_REPO'
 
 from _set_local_env_vars import import_env_vars
 import_env_vars(SITE_ROOT)
@@ -23,6 +25,32 @@ ENVIRONMENTS = {
     'production': ['placehold-production'],
     'test': ['placehold-test'],
 }
+
+env.user = 'django'
+
+# sshagent_run credits to http://lincolnloop.com/blog/2009/sep/22/easy-fabric-deployment-part-1-gitmercurial-and-ssh/
+# modified by dvd :)
+def sshagent_run(cmd, capture=True):
+    """
+    Helper function.
+    Runs a command with SSH agent forwarding enabled.
+
+    Note:: Fabric (and paramiko) can't forward your SSH agent.
+    This helper uses your system's ssh to do so.
+    """
+
+    cwd = env.get('cwd', '')
+    if cwd:
+        cmd = 'cd %s;%s' % (cwd, cmd)
+
+    with settings(cwd=''):
+        for h in env.hosts:
+            try:
+                # catch the port number to pass to ssh
+                host, port = h.split(':')
+                local('ssh -p %s -A %s@%s "%s"' % (port, env.user, host, cmd), capture=capture)
+            except ValueError:
+                local('ssh -A %s@%s "%s"' % (env.user, h, cmd), capture=capture)
 
 @task
 def dev():
@@ -87,58 +115,104 @@ def add_webapp():
         envfile.writelines(['export PRJ_IS_WEBAPP=TRUE', ])
 
 
-################
-# Environment SETUPS
-###############
+@task
+def project_setup():
+    if not exists("/home/django/.virtualenvs/%s" % PRJ_NAME):
+        run('mkvirtualenv %s' % (PRJ_NAME,))
 
-#
-# # sshagent_run credits to http://lincolnloop.com/blog/2009/sep/22/easy-fabric-deployment-part-1-gitmercurial-and-ssh/
-# # modified by dvd :)
-# def sshagent_run(cmd, capture=True):
-#     """
-#     Helper function.
-#     Runs a command with SSH agent forwarding enabled.
-#
-#     Note:: Fabric (and paramiko) can't forward your SSH agent.
-#     This helper uses your system's ssh to do so.
-#     """
-#
-#     cwd = env.get('cwd', '')
-#     if cwd:
-#         cmd = 'cd %s;%s' % (cwd, cmd)
-#
-#     with settings(cwd=''):
-#         for h in env.hosts:
-#             try:
-#                 # catch the port number to pass to ssh
-#                 host, port = h.split(':')
-#                 local('ssh -p %s -A %s@%s "%s"' % (port, env.user, host, cmd), capture=capture)
-#             except ValueError:
-#                 local('ssh -A %s@%s "%s"' % (env.user, h, cmd), capture=capture)
-#
-#
-# def update():
-#     # Clono, se non e' gia stato clonato il progetto
-#     with cd("/home/django/%s" % PROJECT_NAME):
-#         sshagent_run("hg pull -u")
-#         with prefix('workon %s' % PROJECT_NAME):
-#             run("python website/manage.py migrate")
-#             run("python website/manage.py collectstatic --noinput")
-#
-#     env.user = 'root'
-#     run('supervisorctl reload')
-#
-# def restart_server():
-#     env.user = 'root'
-#     run('/etc/init.d/nginx restart')
-#     run('/etc/init.d/supervisor restart')
-#
-#
+    # Clono, se non e' gia stato clonato il progetto
+    with cd("/home/django/"):
+        if not exists(PRJ_NAME):
+            sshagent_run('git clone %s %s' % (GIT_REPO, PRJ_NAME))
 
-#
-#     # SE SI HANNO PROBLEMI CON PIL PERCHE NON INSTALLA IL SUPPORTO AL JPEG (TENDENZIALMENTE IL PROBLEMA
-#     # SI HA CON LE VERSIONI A 64 BIT) CREARE I SEGUENTI LINK SIMBOLICI:
-#     # ln -s /usr/lib/x86_64-linux-gnu/libjpeg.so /usr/lib
-#     # ln -s /usr/lib/x86_64-linux-gnu/libfreetype.so /usr/lib
-#     # ln -s /usr/lib/x86_64-linux-gnu/libz.so /usr/lib
-#
+        with prefix('workon %s' % PRJ_NAME):
+            # Aggiungo all'ambiente virtuale la directory base del progetto e la directory apps
+            run("add2virtualenv /home/django/%s" % PRJ_NAME)
+            run("add2virtualenv /home/django/%s/external_apps" % PRJ_NAME)
+            run("add2virtualenv /home/django/%s/website" % PRJ_NAME)
+
+            with cd(PRJ_NAME):
+                # Installo i pacchetti necessari
+                run("pip install -r requirements/%s.txt" % env.name)
+                #if ENABLE_CMS:
+                #    run("pip install -r requirements/cms.txt")
+
+    # Installo dlight e altre applicazioni necessarie
+    #with cd("/home/django/%s/apps" % PRJ_NAME):
+    #    sshagent_run('hg clone ssh://hg@bitbucket.org/marcominutoli/dlight')
+    #    sshagent_run('git clone https://github.com/marcominutoli/django-oscar.git')
+    #    run("ln -s django-oscar/oscar oscar")
+
+    # Creo un file local.py in settings per la gestione del db
+    db_user = prompt("Nome utente postgres:")
+    db_pwd = prompt("Digitare una password per l'utente %s:" % db_user)
+
+    # Creo un file local.py in settings per la gestione del db
+    db_name = prompt("Nome database da creare:")
+    run("createdb -U %s -h localhost %s" % (db_user, db_name))
+
+    with cd("/home/django/%s/" % PRJ_NAME):
+        run("touch .env")
+        append(".env", "PRJ_ENV=production")
+        append(".env", "PRJ_ENGINE=postgresql_psycopg2")
+        append(".env", "PRJ_NAME=%s" % PRJ_NAME)
+        append(".env", "PRJ_DB=%s" % db_name)
+        append(".env", "PRJ_USER=%s" % db_user)
+        append(".env", "PRJ_PASS=%s" % db_pwd)
+        append(".env", 'PRJ_SECRET_KEY="%s"' % "".join([random.choice(
+                             "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_+)") for i in range(50)]))
+
+    # Installazione app e db
+    with cd("/home/django/%s/website" % PRJ_NAME):
+        with prefix('workon %s' % PRJ_NAME):
+            run("python manage.py syncdb --all")
+            run("python manage.py migrate --fake")
+            run("python manage.py collectstatic")
+
+    env.user = 'root'
+
+    # Per sicurezza, rendo eseguibile il file conf/gunicorn.sh
+    with cd("/home/django/%s/config" % PRJ_NAME):
+        run("chmod +x gunicorn.sh")
+
+    with cd("/etc/nginx/sites-enabled/"):
+        run("ln -s /home/django/%s/config/nginx.conf %s" % (PRJ_NAME, PRJ_NAME))
+
+    with cd("/etc/supervisor/conf.d/"):
+        run("ln -s /home/django/%s/config/supervisor.conf %s.conf" % (PRJ_NAME, PRJ_NAME))
+
+    run("/etc/init.d/supervisor stop")
+    time.sleep(5)
+    run("/etc/init.d/supervisor start")
+    run("supervisorctl reload")
+    run("/etc/init.d/nginx reload")
+
+
+@task
+def update():
+    # Clono, se non e' gia stato clonato il progetto
+    with cd("/home/django/%s" % PRJ_NAME):
+        sshagent_run("git pull")
+        with prefix('workon %s' % PRJ_NAME):
+            run("pip install -r requirements/%s.txt" % env.name)
+            run("python website/manage.py migrate")
+            run("python website/manage.py collectstatic --noinput")
+
+    env.user = 'root'
+    run('supervisorctl reload')
+
+
+@task
+def reload_server():
+    env.user = 'root'
+    run('/etc/init.d/nginx reload')
+    run('supervisorctl reload')
+
+
+@task
+def restart_server():
+    env.user = 'root'
+    run('/etc/init.d/nginx restart')
+    run("/etc/init.d/supervisor stop")
+    time.sleep(5)
+    run("/etc/init.d/supervisor start")
