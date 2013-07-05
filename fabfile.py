@@ -7,7 +7,6 @@ from fabtools import require
 import fabtools
 
 SITE_ROOT = dirname(abspath(__file__))
-GIT_REPO = 'GIT_REPO'
 
 from _set_local_env_vars import import_env_vars
 import_env_vars(SITE_ROOT)
@@ -18,12 +17,16 @@ PRJ_DB = os.environ['PRJ_DB']
 PRJ_USER = os.environ['PRJ_USER']
 PRJ_PASS = os.environ['PRJ_PASS']
 
+PRJ_GIT_REPO = os.environ['PRJ_GIT_REPO']
+PRJ_ADDR_STAGING = os.environ['PRJ_ADDR_STAGING']
+PRJ_ADDR_PRODUCTION = os.environ['PRJ_ADDR_PRODUCTION']
+PRJ_ADDR_TEST = os.environ['PRJ_ADDR_TEST']
 
 ENVIRONMENTS = {
     'dev': ['127.0.0.1'],
-    'staging': ['placehold-staging'],
-    'production': ['placehold-production'],
-    'test': ['placehold-test'],
+    'staging': PRJ_ADDR_STAGING,
+    'production': PRJ_ADDR_PRODUCTION,
+    'test': PRJ_ADDR_TEST,
 }
 
 env.user = 'django'
@@ -83,20 +86,6 @@ def configure_db():
         require.postgres.server()
         require.postgres.user(PRJ_USER, PRJ_PASS)
         require.postgres.database(PRJ_DB, PRJ_USER)
-
-@task
-def configure_git():
-    from sh import rm
-    rm('.hgignore', '-f')
-    rm('.hg', '-f', '-r')
-    rm('.git', '-f', '-r')
-    git_username = raw_input(u"username on bitbucket ? \n")
-    fabtools.require.git.command()
-    local('git init')
-    local('git remote add origin ssh://git@bitbucket.org/%s/%s.git' % (git_username, PRJ_NAME.lower()))
-    local('git add .')
-    local('git commit -m "First commit"')
-    local('git push -u origin master')
 
 @task
 def setup():
