@@ -1,4 +1,4 @@
-import os, time, random
+import os, time, random, getpass
 from os.path import abspath, dirname
 
 from fabric.api import *
@@ -29,6 +29,7 @@ ENVIRONMENTS = {
     'test': PRJ_ADDR_TEST,
 }
 
+
 env.user = 'django'
 
 # sshagent_run credits to http://lincolnloop.com/blog/2009/sep/22/easy-fabric-deployment-part-1-gitmercurial-and-ssh/
@@ -41,7 +42,6 @@ def sshagent_run(cmd, capture=True):
     Note:: Fabric (and paramiko) can't forward your SSH agent.
     This helper uses your system's ssh to do so.
     """
-
     cwd = env.get('cwd', '')
     if cwd:
         cmd = 'cd %s;%s' % (cwd, cmd)
@@ -103,7 +103,6 @@ def add_webapp():
         for line in lines: pass #todo "search and replace or append" instead of just appending
         envfile.writelines(['export PRJ_IS_WEBAPP=TRUE', ])
 
-
 @task
 def project_setup():
     if not exists("/home/django/.virtualenvs/%s" % PRJ_NAME):
@@ -112,7 +111,7 @@ def project_setup():
     # Clono, se non e' gia stato clonato il progetto
     with cd("/home/django/"):
         if not exists(PRJ_NAME):
-            sshagent_run('git clone %s %s' % (GIT_REPO, PRJ_NAME))
+            sshagent_run('git clone %s %s' % (PRJ_GIT_REPO, PRJ_NAME))
 
         with prefix('workon %s' % PRJ_NAME):
             # Aggiungo all'ambiente virtuale la directory base del progetto e la directory apps
@@ -132,22 +131,30 @@ def project_setup():
     #    sshagent_run('git clone https://github.com/marcominutoli/django-oscar.git')
     #    run("ln -s django-oscar/oscar oscar")
 
-    # Creo un file local.py in settings per la gestione del db
-    db_user = prompt("Nome utente postgres:")
-    db_pwd = prompt("Digitare una password per l'utente %s:" % db_user)
+    # Creo il db
+    remote_db_name = raw_input(u"db name for the %s db ? (defaults to project name) \n" % env.name)
+    if len(remote_db_name.strip()) == 0:
+        remote_db_name = PRJ_NAME
 
-    # Creo un file local.py in settings per la gestione del db
-    db_name = prompt("Nome database da creare:")
-    run("createdb -U %s -h localhost %s" % (db_user, db_name))
+    remote_db_user = raw_input(u"username for the %s db ? (defaults to db name) \n" % env.name)
+    if len(remote_db_user.strip()) == 0:
+        remote_db_user = remote_db_name
+
+    remote_db_pass = getpass.getpass(u"password for the %s db ? (defaults to username) \n" % env.name)
+    if len(remote_db_pass.strip()) == 0:
+        remote_db_pass = remote_db_user
+
+    run("createuser -U postgres -d -R -S %s" % remote_db_user)
+    run("createdb -U %s -h localhost %s" % (remote_db_user, remote_db_name))
 
     with cd("/home/django/%s/" % PRJ_NAME):
         run("touch .env")
-        append(".env", "PRJ_ENV=production")
+        append(".env", "PRJ_ENV=%s" % env.name)
         append(".env", "PRJ_ENGINE=postgresql_psycopg2")
         append(".env", "PRJ_NAME=%s" % PRJ_NAME)
-        append(".env", "PRJ_DB=%s" % db_name)
-        append(".env", "PRJ_USER=%s" % db_user)
-        append(".env", "PRJ_PASS=%s" % db_pwd)
+        append(".env", "PRJ_DB=%s" % PRJ_DB)
+        append(".env", "PRJ_USER=%s" % PRJ_USER)
+        append(".env", "PRJ_PASS=%s" % PRJ_PASS)
         append(".env", 'PRJ_SECRET_KEY="%s"' % "".join([random.choice(
                              "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_+)") for i in range(50)]))
 
@@ -161,21 +168,20 @@ def project_setup():
     env.user = 'root'
 
     # Per sicurezza, rendo eseguibile il file conf/gunicorn.sh
-    with cd("/home/django/%s/config" % PRJ_NAME):
+    with cd("/home/django/%s/etc" % PRJ_NAME):
         run("chmod +x gunicorn.sh")
 
     with cd("/etc/nginx/sites-enabled/"):
-        run("ln -s /home/django/%s/config/nginx.conf %s" % (PRJ_NAME, PRJ_NAME))
+        run("ln -s /home/django/%s/etc/nginx.conf %s" % (PRJ_NAME, PRJ_NAME))
 
     with cd("/etc/supervisor/conf.d/"):
-        run("ln -s /home/django/%s/config/supervisor.conf %s.conf" % (PRJ_NAME, PRJ_NAME))
+        run("ln -s /home/django/%s/etc/supervisor.conf %s.conf" % (PRJ_NAME, PRJ_NAME))
 
     run("/etc/init.d/supervisor stop")
     time.sleep(5)
     run("/etc/init.d/supervisor start")
     run("supervisorctl reload")
     run("/etc/init.d/nginx reload")
-
 
 @task
 def update():
@@ -186,17 +192,14 @@ def update():
             run("pip install -r requirements/%s.txt" % env.name)
             run("python website/manage.py migrate")
             run("python website/manage.py collectstatic --noinput")
-
     env.user = 'root'
     run('supervisorctl reload')
-
 
 @task
 def reload_server():
     env.user = 'root'
     run('/etc/init.d/nginx reload')
     run('supervisorctl reload')
-
 
 @task
 def restart_server():

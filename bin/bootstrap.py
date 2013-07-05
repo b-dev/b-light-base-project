@@ -7,16 +7,12 @@ import subprocess
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO_NAME = os.path.basename(REPO_ROOT)
 
-def _replace_in_vagrant_file(prj_root, dict):
-    fpath = prj_root+"/Vagrantfile"
+def _replace_in_file(prj_root, file_name, dict):
+    fpath = prj_root+"/"+file_name
     with open(fpath) as f:
         s = f.read()
-    s = s.replace('PRJ_NAME', dict['PRJ_NAME'])
-    s = s.replace('PRJ_ENV', dict['PRJ_ENV'])
-    s = s.replace('PRJ_ENGINE', dict['PRJ_ENGINE'])
-    s = s.replace('PRJ_DB', dict['PRJ_DB'])
-    s = s.replace('PRJ_USER', dict['PRJ_USER'])
-    s = s.replace('PRJ_PASS', dict['PRJ_PASS'])
+    for key in dict.keys():
+        s = s.replace(key, dict[key])
     with open(fpath, 'w') as f:
         f.write(s)
 
@@ -56,7 +52,7 @@ if __name__ == '__main__':
     if len(PRJ_ADDR_TEST.strip()) == 0:
         PRJ_ADDR_TEST = ''
 
-    _replace_in_vagrant_file(PRJ_ROOT,
+    _replace_in_file(PRJ_ROOT, 'Vagrantfile',
                              {
                                  'PRJ_NAME' : PRJ_NAME,
                                  'PRJ_ENV' : PRJ_ENV,
@@ -69,6 +65,18 @@ if __name__ == '__main__':
                                  'PRJ_ADDR_PRODUCTION' : PRJ_ADDR_PRODUCTION,
                                  'PRJ_ADDR_TEST' : PRJ_ADDR_TEST,
                              })
+    _replace_in_file(PRJ_ROOT, 'etc/gunicorn.sh',
+        {
+            'PRJ_NAME' : PRJ_NAME,
+        })
+    _replace_in_file(PRJ_ROOT, 'etc/nginx.conf',
+        {
+            'PRJ_NAME' : PRJ_NAME,
+        })
+    _replace_in_file(PRJ_ROOT, 'etc/supervisor.conf',
+        {
+            'PRJ_NAME' : PRJ_NAME,
+        })
 
     with open(os.path.join(REPO_ROOT, '.env'), 'w') as env_file:
         env_file.writelines(['export PRJ_ENV=%s\n' % PRJ_ENV,
@@ -78,11 +86,11 @@ if __name__ == '__main__':
                              'export PRJ_USER=%s\n' % PRJ_USER,
                              'export PRJ_PASS=%s\n' % PRJ_PASS,
                              'export PRJ_SECRET_KEY="%s"\n' % "".join([random.choice(
-                                 "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_+)") for i in range(50)]),
+                                 "abcdefghijklmnopqrstuvwxyz0123456789!@#%^&*(-_+)") for i in range(50)]),
                              'export PRJ_GIT_REPO=%s\n' % PRJ_GIT_REPO,
                              'export PRJ_ADDR_STAGING=%s\n' % PRJ_ADDR_STAGING,
                              'export PRJ_ADDR_PRODUCTION=%s\n' % PRJ_ADDR_PRODUCTION,
-                             'export PRJ_ADDR_TEST=%s\n' % PRJ_ADDR_TEST,
+                             'export PRJ_ADDR_TEST=%s' % PRJ_ADDR_TEST,
                            ])
 
     process = subprocess.Popen('rm -f ../.hgignore', shell=True, executable="/bin/bash")
