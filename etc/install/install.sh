@@ -21,7 +21,8 @@ export LANGUAGE=en_GB.UTF-8
 export LANG=en_GB.UTF-8
 export LC_ALL=en_GB.UTF-8
 
-# Install essential packages from Apt
+# Install essential packages from Apt, avoiding post install questions (truly non-interactive)
+export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get upgrade -y
 # Python dev packages
