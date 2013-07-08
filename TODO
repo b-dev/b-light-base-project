@@ -7,3 +7,4 @@ have the upgrading of debian packages on vagrant provisiong optional from .env v
 have the pip install/upgrade optionally from .env variable
 configure port forwarding to reach postgres from the host
 bootstrapping should clear the README, adding a reference to the base project as header
+add DBBACKUP_TOKENS_FILEPATH, DBBACKUP_DROPBOX_APP_KEY, DBBACKUP_DROPBOX_APP_SECRET in .env file

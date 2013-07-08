@@ -211,6 +211,7 @@ THIRD_PARTY_APPS = (
     'south',
     'sekizai',
     'crispy_forms',
+    'dbbackup',
 )
 
 # Apps specific for this project go here.
@@ -257,3 +258,14 @@ LOGGING = {
     }
 }
 ########## END LOGGING CONFIGURATION
+
+########## BACKUP CONFIGURATION
+DBBACKUP_STORAGE = 'dbbackup.storage.dropbox_storage'
+DBBACKUP_TOKENS_FILEPATH = 'xxx'
+DBBACKUP_DROPBOX_APP_KEY = 'xxx'
+DBBACKUP_DROPBOX_APP_SECRET = 'xxx'
+DBBACKUP_DROPBOX_ACCESS_TYPE = 'app_folder'
+DBBACKUP_DROPBOX_DIRECTORY = PRJ_NAME
+DBBACKUP_MEDIA_PATH = MEDIA_ROOT
+DBBACKUP_CLEANUP_KEEP = 3
+########## END BACKUP CONFIGURATION

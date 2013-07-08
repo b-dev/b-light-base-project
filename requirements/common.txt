@@ -12,6 +12,7 @@ django-sekizai
 fancy_tag
 django-braces
 django-model-utils
+django-dbbackup
 
 # Other libs probably needed
 fabtools
