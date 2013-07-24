@@ -26,5 +26,4 @@ Vagrant::Config.run do |config|
 
 	# Enable provisioning with a shell script.
 	config.vm.provision :shell, :path => "etc/install/install.sh"
-	#, :args => "PRJ_ENV PRJ_NAME ..."
 end
