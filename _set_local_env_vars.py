@@ -13,5 +13,6 @@ def import_env_vars(project_root):
                         "in order to run the server in your local machine. "
                         "This specifies some necessary environment variables. ")
     for line in envfile.readlines():
-        [key,value] = line.replace('export ', '').strip().split("=")
-        os.environ[key] = value
+        if len(line) > 1 and not line[0:1] == '#':
+            [key,value] = line.replace('export ', '').strip().split("=")
+            os.environ[key] = value

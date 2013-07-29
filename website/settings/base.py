@@ -1,7 +1,9 @@
 """Common settings and globals."""
 from os import environ
-from os.path import abspath, basename, dirname, join, normpath
-from sys import path
+from os.path import abspath, basename, dirname, join, normpath, isfile
+from os import listdir
+import imp
+
 
 ugettext = lambda s: s
 
@@ -222,8 +224,16 @@ LOCAL_APPS = (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
-if environ.get('PRJ_IS_WEBAPP', '') == 'TRUE':
-    from .webapp import *
+# Import settings specific to a plugged set of applications
+settings_path = join(DJANGO_ROOT, 'settings')
+plugged_settings_files = [ f for f in listdir(settings_path) if
+                           ( isfile(join(settings_path, f)) and f[0:5] == 'plug_' and f[-3:] == '.py') ]
+for f in plugged_settings_files:
+    plugged_settings = imp.load_source(f, join(settings_path, f))
+    INSTALLED_APPS += plugged_settings.PLUG_INSTALLED_APPS
+    for name in plugged_settings.PLUGGED_CONFIGS:
+        globals()[name] = getattr(plugged_settings, name)
+
 ########## END APP CONFIGURATION
 
 

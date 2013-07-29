@@ -1,5 +1,5 @@
 import os, time, random, getpass
-from os.path import abspath, dirname
+from os.path import abspath, dirname, isfile
 
 from fabric.api import *
 from fabric.contrib.files import append, exists
@@ -92,16 +92,63 @@ def setup():
     configure_db()
 
 @task
-def add_webapp():
+def plug_prerequisites(name):
+    env.user = 'vagrant'
+    pah = os.path.join(SITE_ROOT, 'etc', 'install', 'plug_%s.pkg' % name)
+    packages_to_install = []
+    with open(pah, 'r') as pkgs_file:
+        lines = pkgs_file.readlines()
+        for line in lines:
+            if len(line) and not line[0:1] == '#':
+                packages_to_install.append(line.strip())
+    require.deb.packages(packages_to_install)
+
+@task
+def plug_packages(name):
     from sh import pip
-    for line in pip.install('-r%s/requirements/webapp.txt' % SITE_ROOT, _iter=True):
+    for line in pip.install('-r%s/requirements/plug_%s.txt' % (SITE_ROOT, name), _iter=True):
         print line
 
-    pah = os.path.join(SITE_ROOT, '.env')
-    with open(pah, 'r+') as envfile:
+
+def set_plug_active(name, pah=os.path.join(SITE_ROOT, '.env')):
+    templines = []
+    with open(pah, 'r') as envfile:
         lines = envfile.readlines()
-        for line in lines: pass #todo "search and replace or append" instead of just appending
-        envfile.writelines(['export PRJ_IS_WEBAPP=TRUE', ])
+        found = False
+        for line in lines:
+            if line.find('export PRJ_IS_%s=' % name.upper()) == 0:
+                if line.find('TRUE') == 0:
+                    templines.append(line)
+                else:
+                    templines.append(line.replace('FALSE', 'TRUE'))
+                found = True
+            else:
+                templines.append(line)
+        if not found:
+            templines.append('export PRJ_IS_%s=TRUE' % name.upper())
+    with open(pah, 'w') as newfile:
+        newfile.writelines(templines)
+
+@task
+def plug(name):
+    set_plug_active(name)
+    # replace_or_append('export PRJ_IS_%s=FALSE' % name.upper(), 'export PRJ_IS_%s=TRUE' % name.upper(), pah)
+    # replace_or_append('export PRJ_IS_%s=TRUE' % name.upper(), 'export PRJ_IS_%s=TRUE' % name.upper(), pah)
+
+
+    plug_prerequisites(name)
+    plug_packages(name)
+
+
+@task
+def plug_all():
+    for key, val in os.environ.items():
+        if key[0:7] == 'PRJ_IS_' and val == 'TRUE':
+            name = key[7:].lower()
+            print "plugging '%s' apps group" % name
+            plug_prerequisites(name)
+            plug_packages(name)
+
 
 @task
 def project_setup():
@@ -122,14 +169,6 @@ def project_setup():
             with cd(PRJ_NAME):
                 # Installo i pacchetti necessari
                 run("pip install -r requirements/%s.txt" % env.name)
-                #if ENABLE_CMS:
-                #    run("pip install -r requirements/cms.txt")
-
-    # Installo dlight e altre applicazioni necessarie
-    #with cd("/home/django/%s/apps" % PRJ_NAME):
-    #    sshagent_run('hg clone ssh://hg@bitbucket.org/marcominutoli/dlight')
-    #    sshagent_run('git clone https://github.com/marcominutoli/django-oscar.git')
-    #    run("ln -s django-oscar/oscar oscar")
 
     # Creo il db
     remote_db_name = raw_input(u"db name for the %s db ? (defaults to project name) \n" % env.name)

@@ -78,20 +78,25 @@ if __name__ == '__main__':
             'PRJ_NAME' : PRJ_NAME,
         })
 
+    env_file_lines = [
+        'export PRJ_ENV=%s' % PRJ_ENV,
+        '\nexport PRJ_NAME=%s' % PRJ_NAME,
+        '\nexport PRJ_ENGINE=%s' % 'postgresql_psycopg2',
+        '\nexport PRJ_DB=%s' % PRJ_DB    ,
+        '\nexport PRJ_USER=%s' % PRJ_USER,
+        '\nexport PRJ_PASS=%s' % PRJ_PASS,
+        '\nexport PRJ_SECRET_KEY="%s"' % "".join([random.choice(
+         "abcdefghijklmnopqrstuvwxyz0123456789!@#%^&*(-_+)") for i in range(50)]),
+        '\nexport PRJ_GIT_REPO=%s' % PRJ_GIT_REPO,
+        '\nexport PRJ_ADDR_STAGING=%s' % PRJ_ADDR_STAGING,
+        '\nexport PRJ_ADDR_PRODUCTION=%s' % PRJ_ADDR_PRODUCTION,
+        '\nexport PRJ_ADDR_TEST=%s' % PRJ_ADDR_TEST,
+        ]
+    for plugged_app_label in sys.argv[2:]:
+        env_file_lines.append('\nexport PRJ_IS_%s=TRUE' % plugged_app_label.upper())
+
     with open(os.path.join(REPO_ROOT, '.env'), 'w') as env_file:
-        env_file.writelines(['export PRJ_ENV=%s\n' % PRJ_ENV,
-                             'export PRJ_NAME=%s\n' % PRJ_NAME,
-                             'export PRJ_ENGINE=%s\n' % 'postgresql_psycopg2',
-                             'export PRJ_DB=%s\n' % PRJ_DB    ,
-                             'export PRJ_USER=%s\n' % PRJ_USER,
-                             'export PRJ_PASS=%s\n' % PRJ_PASS,
-                             'export PRJ_SECRET_KEY="%s"\n' % "".join([random.choice(
-                                 "abcdefghijklmnopqrstuvwxyz0123456789!@#%^&*(-_+)") for i in range(50)]),
-                             'export PRJ_GIT_REPO=%s\n' % PRJ_GIT_REPO,
-                             'export PRJ_ADDR_STAGING=%s\n' % PRJ_ADDR_STAGING,
-                             'export PRJ_ADDR_PRODUCTION=%s\n' % PRJ_ADDR_PRODUCTION,
-                             'export PRJ_ADDR_TEST=%s' % PRJ_ADDR_TEST,
-                           ])
+        env_file.writelines(env_file_lines)
 
     process = subprocess.Popen('rm -f ../.hgignore', shell=True, executable="/bin/bash")
     while process.poll() == None: pass

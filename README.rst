@@ -24,7 +24,7 @@ Local deployment::
 
     git clone git@github.com:marcominutoli/b-light-base-project.git [project_name]
     cd [project_name]/bin
-    python bootstrap.py [dev|production|staging|test]
+    python bootstrap.py [dev|production|staging|test] [space separated list of pluggable apps groups]
 
 default for the project environment is 'dev', environment types are:
 
@@ -32,6 +32,11 @@ default for the project environment is 'dev', environment types are:
  * 'test' ( todo description )
  * 'staging' ( todo description )
  * 'production' ( todo description )
+
+'pluggable apps groups' are sets of deploy actions on the vagrant machine and python apps installed as part of the base project.
+currently the groups are:
+
+ * 'webapp' : installs redis server and configures in the django project django-rest-framework
 
 
 If using Vagrant:
@@ -52,6 +57,11 @@ TODO
 
 When deploying:
 ---------------
+
+TODO
+
+Making your own pluggable app group
+-----------------------------------
 
 TODO
 

@@ -1,0 +1,4 @@
+# project specific requirements
+libxml2-dev
+libxslt1-dev
+redis-server
