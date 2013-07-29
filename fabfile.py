@@ -125,7 +125,7 @@ def set_plug_active(name, pah=os.path.join(SITE_ROOT, '.env')):
             else:
                 templines.append(line)
         if not found:
-            templines.append('export PRJ_IS_%s=TRUE' % name.upper())
+            templines.append('\nexport PRJ_IS_%s=TRUE' % name.upper())
     with open(pah, 'w') as newfile:
         newfile.writelines(templines)
 

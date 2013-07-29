@@ -229,10 +229,12 @@ settings_path = join(DJANGO_ROOT, 'settings')
 plugged_settings_files = [ f for f in listdir(settings_path) if
                            ( isfile(join(settings_path, f)) and f[0:5] == 'plug_' and f[-3:] == '.py') ]
 for f in plugged_settings_files:
-    plugged_settings = imp.load_source(f, join(settings_path, f))
-    INSTALLED_APPS += plugged_settings.PLUG_INSTALLED_APPS
-    for name in plugged_settings.PLUGGED_CONFIGS:
-        globals()[name] = getattr(plugged_settings, name)
+    name = f[5:-3]
+    if environ.get('PRJ_IS_%s' % name.upper(), 'FALSE') == 'TRUE':
+        plugged_settings = imp.load_source(f, join(settings_path, f))
+        INSTALLED_APPS += plugged_settings.PLUG_INSTALLED_APPS
+        for name in plugged_settings.PLUGGED_CONFIGS:
+            globals()[name] = getattr(plugged_settings, name)
 
 ########## END APP CONFIGURATION
 
