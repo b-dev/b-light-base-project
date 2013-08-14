@@ -25,6 +25,7 @@ export LC_ALL=en_GB.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
 apt-get upgrade -y
+apt-get autoremove -y
 # Python dev packages
 apt-get install -y build-essential python python-dev python-setuptools python-pip vim
 # Dependencies for image processing with PIL
