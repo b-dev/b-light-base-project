@@ -91,6 +91,9 @@ if __name__ == '__main__':
         '\nexport PRJ_ADDR_STAGING=%s' % PRJ_ADDR_STAGING,
         '\nexport PRJ_ADDR_PRODUCTION=%s' % PRJ_ADDR_PRODUCTION,
         '\nexport PRJ_ADDR_TEST=%s' % PRJ_ADDR_TEST,
+        '\nexport PRJ_DEB_UPGRADE=TRUE',
+        '\nexport PRJ_PIP_UPGRADE=TRUE',
+        '\nexport PRJ_ASSETS_UPGRADE=TRUE',
         ]
     for plugged_app_label in sys.argv[2:]:
         env_file_lines.append('\nexport PRJ_IS_%s=TRUE' % plugged_app_label.upper())
@@ -98,14 +101,18 @@ if __name__ == '__main__':
     with open(os.path.join(REPO_ROOT, '.env'), 'w') as env_file:
         env_file.writelines(env_file_lines)
 
-    process = subprocess.Popen('rm -f ../.hgignore', shell=True, executable="/bin/bash")
-    while process.poll() == None: pass
-    process = subprocess.Popen('rm -fr ../.hg', shell=True, executable="/bin/bash")
-    while process.poll() == None: pass
-    process = subprocess.Popen('rm -fr ../.git', shell=True, executable="/bin/bash")
-    while process.poll() == None: pass
-    process = subprocess.Popen('cd .. && git init', shell=True, executable="/bin/bash")
-    while process.poll() == None: pass
-    process = subprocess.Popen('cd .. && git remote add origin %s' % PRJ_GIT_REPO, shell=True, executable="/bin/bash")
-    while process.poll() == None: pass
-    subprocess.Popen('cd .. && git add .', shell=True, executable="/bin/bash")
+    INIT_GIT = raw_input(u"you just cloned the template project ? (I will remove current git config and create it from scratch in that case) \n[y/n]\n")
+    if INIT_GIT in ('y', 'yes', 'Y', 'YES'):
+        process = subprocess.Popen('rm -f ../.hgignore', shell=True, executable="/bin/bash")
+        while process.poll() == None: pass
+        process = subprocess.Popen('rm -fr ../.hg', shell=True, executable="/bin/bash")
+        while process.poll() == None: pass
+        process = subprocess.Popen('rm -fr ../.git', shell=True, executable="/bin/bash")
+        while process.poll() == None: pass
+        process = subprocess.Popen('cd .. && git init', shell=True, executable="/bin/bash")
+        while process.poll() == None: pass
+        if PRJ_GIT_REPO:
+            process = subprocess.Popen('cd .. && git remote add origin %s' % PRJ_GIT_REPO,
+                                       shell=True, executable="/bin/bash")
+            while process.poll() == None: pass
+        subprocess.Popen('cd .. && git add .', shell=True, executable="/bin/bash")

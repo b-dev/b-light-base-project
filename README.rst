@@ -5,9 +5,8 @@ D-light base project
 A complete skeleton for Django projects, using:
 -----------------------------------------------
 * Django 1.5
-* jquery 1.10
-* jquery ui 1.10
-* bootstrap 2.3
+* Pip in virtualenv(wrapper)
+* Bower
 
 Project is configured to use Vagrant (1.2.2) on VirtualBox (4.2.12) during development, tested with PyCharm on Ubuntu and MacOSX.
 Deployment is made with Gunicorn and Nginx.
@@ -48,7 +47,8 @@ If using Vagrant:
     vagrant up
 
 This initialize a virtual machine with a user 'django' (password 'django') providing a virtualenv connected to the project.
-Debian packages are kept upgraded by the provisioning.
+Debian packages are kept upgraded by the provisioning as long PRJ_DEB_UPGRADE=TRUE in .env file.
+The same for Pip packages in the virtualenv with PRJ_PIP_UPGRADE=TRUE.
 
 If not using Vagrant:
 ---------------------
