@@ -91,6 +91,15 @@ def configure_db():
 def setup():
     configure_db()
 
+
+@task
+def bower():
+    from sh import bower
+    pah = os.path.join(SITE_ROOT, 'requirements', 'clientside.txt')
+    with open(pah, 'r') as reqfile:
+        for line in reqfile:
+            bower.install(line.strip())
+
 @task
 def plug_prerequisites(name):
     env.user = 'vagrant'

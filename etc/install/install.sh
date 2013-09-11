@@ -33,11 +33,27 @@ if [[ $PRJ_DEB_UPGRADE == 'TRUE' ]]; then
 fi
 # Python dev packages
 apt-get install -y build-essential python python-dev python-setuptools python-pip vim
+
 # Dependencies for image processing with PIL
 apt-get install -y libjpeg62-dev zlib1g-dev libfreetype6-dev liblcms1-dev
+
 # Git (we'd rather avoid people keeping credentials for git commits in the repo,
 #  but sometimes we need it for pip requirements that aren't in PyPI)
 apt-get install -y git
+
+# Bower
+# standard nodejs on ubuntu is currently outdated, we replace it following the offical doc
+# https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
+apt-get remove nodejs
+apt-get autoremove
+dpkg --purge nodejs-dev npm
+sudo apt-get update
+sudo apt-get -y install python-software-properties python g++ make
+sudo add-apt-repository -y ppa:chris-lea/node.js
+sudo apt-get update
+sudo apt-get install -y nodejs
+npm install -g bower
+
 
 # Postgresql
 if ! command -v psql; then
@@ -86,4 +102,5 @@ chmod a+x $PROJECT_DIR/website/manage.py
 su - django -c "source /usr/local/bin/virtualenvwrapper.sh && workon $PRJ_NAME && add2virtualenv /vagrant/website/"
 su - django -c "source /usr/local/bin/virtualenvwrapper.sh && workon $PRJ_NAME && add2virtualenv /vagrant/"
 su - django -c "source $VIRTUALENV_DIR/bin/activate && fab -f /vagrant/fabfile.py $PRJ_ENV plug_all"
+su - django -c "source /usr/local/bin/virtualenvwrapper.sh && workon $PRJ_NAME && fab bower"
 su - django -c "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && python website/manage.py syncdb --all --noinput && python website/manage.py migrate --fake"
