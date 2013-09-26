@@ -42,7 +42,7 @@ If using Vagrant:
 -----------------
 
 ( note that currently VirtualBox 4.2.14 seems bugged and will fail when importing the vagrant box )::
-
+    vagrant plugin install vagrant-vbguest  ( just the first time )
     cd ..
     vagrant up
 
