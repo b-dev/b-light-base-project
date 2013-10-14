@@ -233,7 +233,7 @@ for f in plugged_settings_files:
     if environ.get('PRJ_IS_%s' % name.upper(), 'FALSE') == 'TRUE':
         plugged_settings = imp.load_source(f, join(settings_path, f))
         INSTALLED_APPS += plugged_settings.PLUG_INSTALLED_APPS
-        for name in plugged_settings.PLUGGED_CONFIGS:
+        for name in getattr(plugged_settings, 'PLUGGED_CONFIGS', []):
             globals()[name] = getattr(plugged_settings, name)
 
 ########## END APP CONFIGURATION
