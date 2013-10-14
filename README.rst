@@ -38,6 +38,13 @@ currently the groups are:
  * 'webapp' : installs redis server and configures in the django project django-rest-framework
 
 
+If not using Vagrant:
+---------------------
+
+mkvirtualenv [project_name]
+make project_setup
+
+
 If using Vagrant:
 -----------------
 
@@ -50,10 +57,6 @@ This initialize a virtual machine with a user 'django' (password 'django') provi
 Debian packages are kept upgraded by the provisioning as long PRJ_DEB_UPGRADE=TRUE in .env file.
 The same for Pip packages in the virtualenv with PRJ_PIP_UPGRADE=TRUE.
 
-If not using Vagrant:
----------------------
-
-TODO
 
 When deploying:
 ---------------
