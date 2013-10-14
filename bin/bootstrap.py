@@ -65,18 +65,9 @@ if __name__ == '__main__':
                                  'PRJ_ADDR_PRODUCTION' : PRJ_ADDR_PRODUCTION,
                                  'PRJ_ADDR_TEST' : PRJ_ADDR_TEST,
                              })
-    _replace_in_file(PRJ_ROOT, 'etc/gunicorn.sh',
-        {
-            'PRJ_NAME' : PRJ_NAME,
-        })
-    _replace_in_file(PRJ_ROOT, 'etc/nginx.conf',
-        {
-            'PRJ_NAME' : PRJ_NAME,
-        })
-    _replace_in_file(PRJ_ROOT, 'etc/supervisor.conf',
-        {
-            'PRJ_NAME' : PRJ_NAME,
-        })
+    _replace_in_file(PRJ_ROOT, 'etc/gunicorn.sh',{'PRJ_NAME' : PRJ_NAME})
+    _replace_in_file(PRJ_ROOT, 'etc/nginx.conf',{'PRJ_NAME' : PRJ_NAME})
+    _replace_in_file(PRJ_ROOT, 'etc/supervisor.conf',{'PRJ_NAME' : PRJ_NAME})
 
     env_file_lines = [
         'export PRJ_ENV=%s' % PRJ_ENV,
@@ -103,16 +94,16 @@ if __name__ == '__main__':
 
     INIT_GIT = raw_input(u"you just cloned the template project ? (I will remove current git config and create it from scratch in that case) \n[y/n]\n")
     if INIT_GIT in ('y', 'yes', 'Y', 'YES'):
-        process = subprocess.Popen('rm -f ../.hgignore', shell=True, executable="/bin/bash")
+        process = subprocess.Popen('cd %s && rm -f .hgignore' % PRJ_ROOT, shell=True, executable="/bin/bash")
         while process.poll() == None: pass
-        process = subprocess.Popen('rm -fr ../.hg', shell=True, executable="/bin/bash")
+        process = subprocess.Popen('cd %s && rm -fr .hg' % PRJ_ROOT, shell=True, executable="/bin/bash")
         while process.poll() == None: pass
-        process = subprocess.Popen('rm -fr ../.git', shell=True, executable="/bin/bash")
+        process = subprocess.Popen('cd %s && rm -fr .git' % PRJ_ROOT, shell=True, executable="/bin/bash")
         while process.poll() == None: pass
-        process = subprocess.Popen('cd .. && git init', shell=True, executable="/bin/bash")
+        process = subprocess.Popen('cd %s && git init' % PRJ_ROOT, shell=True, executable="/bin/bash")
         while process.poll() == None: pass
         if PRJ_GIT_REPO:
-            process = subprocess.Popen('cd .. && git remote add origin %s' % PRJ_GIT_REPO,
+            process = subprocess.Popen('cd %s && git remote add origin %s' % (PRJ_ROOT, PRJ_GIT_REPO),
                                        shell=True, executable="/bin/bash")
             while process.poll() == None: pass
-        subprocess.Popen('cd .. && git add .', shell=True, executable="/bin/bash")
+        subprocess.Popen('cd %s && git add .' % PRJ_ROOT, shell=True, executable="/bin/bash")

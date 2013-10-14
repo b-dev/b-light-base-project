@@ -22,8 +22,7 @@ To deploy this application, you need to follow these steps:
 Local deployment::
 
     git clone git@github.com:marcominutoli/b-light-base-project.git [project_name]
-    cd [project_name]/bin
-    python bootstrap.py [dev|production|staging|test] [space separated list of pluggable apps groups]
+    cd [project_name]
 
 default for the project environment is 'dev', environment types are:
 
@@ -41,7 +40,7 @@ currently the groups are:
 If not using Vagrant:
 ---------------------
 
-mkvirtualenv [project_name]
+mkvirtualenv [project_name] && add2virtualenv . && add2virtualenv website && add2virtualenv external_apps
 make project_setup
 
 
