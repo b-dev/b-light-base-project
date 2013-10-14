@@ -39,6 +39,7 @@ currently the groups are:
 
 If not using Vagrant:
 ---------------------
+::
 
     mkvirtualenv [project_name]
     add2virtualenv .
