@@ -40,7 +40,10 @@ currently the groups are:
 If not using Vagrant:
 ---------------------
 
-mkvirtualenv [project_name] && add2virtualenv . && add2virtualenv website && add2virtualenv external_apps
+mkvirtualenv [project_name]
+add2virtualenv .
+add2virtualenv website
+add2virtualenv external_apps
 make project_setup
 
 
