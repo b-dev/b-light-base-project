@@ -64,7 +64,7 @@ DATABASES = {
         'NAME': dbname,
         'USER': PRJ_USER,
         'PASSWORD': PRJ_PASS,
-        'HOST': '',
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
