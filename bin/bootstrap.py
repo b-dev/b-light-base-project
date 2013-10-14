@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     CREATE_DB = raw_input(u"vuoi creare il database?\n[y/n]\n")
     if CREATE_DB in ('y', 'yes', 'Y', 'YES'):
-        process = subprocess.Popen('createdb -U %s -h localhost %s' % (PRJ_USER, PRJ_DB,), shell=True,
+        process = subprocess.Popen('export PGPASSWORD=%s && createdb -U %s -h localhost %s' % (PRJ_PASS, PRJ_USER, PRJ_DB,), shell=True,
                                    executable="/bin/bash")
 
     PRJ_GIT_REPO = raw_input(u"repo url for the project ? \n")
