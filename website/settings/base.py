@@ -22,6 +22,7 @@ PRJ_ENV = environ['PRJ_ENV']
 PRJ_NAME = environ['PRJ_NAME']
 PRJ_ENGINE = environ['PRJ_ENGINE']
 PRJ_DB = environ['PRJ_DB']
+PRJ_DB_HOST = environ['PRJ_DB_HOST']
 PRJ_USER = environ['PRJ_USER']
 PRJ_PASS = environ['PRJ_PASS']
 PRJ_SECRET_KEY = environ['PRJ_SECRET_KEY']
@@ -65,7 +66,7 @@ DATABASES = {
         'NAME': dbname,
         'USER': PRJ_USER,
         'PASSWORD': PRJ_PASS,
-        'HOST': 'localhost',
+        'HOST': PRJ_DB_HOST,
         'PORT': '',
     }
 }

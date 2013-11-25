@@ -83,7 +83,8 @@ if __name__ == '__main__':
         'export PRJ_ENV=%s' % PRJ_ENV,
         '\nexport PRJ_NAME=%s' % PRJ_NAME,
         '\nexport PRJ_ENGINE=%s' % 'postgresql_psycopg2',
-        '\nexport PRJ_DB=%s' % PRJ_DB    ,
+        '\nexport PRJ_DB=%s' % PRJ_DB,
+        '\nexport PRJ_DB_HOST=localhost',
         '\nexport PRJ_USER=%s' % PRJ_USER,
         '\nexport PRJ_PASS=%s' % PRJ_PASS,
         '\nexport PRJ_SECRET_KEY="%s"' % "".join([random.choice(
