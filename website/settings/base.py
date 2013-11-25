@@ -25,6 +25,7 @@ PRJ_DB = environ['PRJ_DB']
 PRJ_USER = environ['PRJ_USER']
 PRJ_PASS = environ['PRJ_PASS']
 PRJ_SECRET_KEY = environ['PRJ_SECRET_KEY']
+PRJ_ENABLE_CMS = environ['PRJ_ENABLE_CMS']
 
 # Site name:
 SITE_NAME = basename(SITE_ROOT)
@@ -145,7 +146,7 @@ FIXTURE_DIRS = (
 
 ########## TEMPLATE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
-TEMPLATE_CONTEXT_PROCESSORS = (
+TEMPLATE_CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
@@ -155,7 +156,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
     'sekizai.context_processors.sekizai'
-)
+]
+if PRJ_ENABLE_CMS:
+    TEMPLATE_CONTEXT_PROCESSORS.append('cms.context_processors.media')
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
 TEMPLATE_LOADERS = (
@@ -172,7 +175,7 @@ TEMPLATE_DIRS = (
 
 ########## MIDDLEWARE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     # Default Django middleware.
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -180,7 +183,14 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
+if PRJ_ENABLE_CMS:
+    MIDDLEWARE_CLASSES.extend([
+        'cms.middleware.page.CurrentPageMiddleware',
+        'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.toolbar.ToolbarMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware'
+    ])
 ########## END MIDDLEWARE CONFIGURATION
 
 
@@ -221,8 +231,26 @@ LOCAL_APPS = (
     'website',
 )
 
+CMS_APPS = (
+    'djangocms_text_ckeditor',
+    'cms',
+    'cms.stacks',
+    'mptt',
+    'menus',
+    'filer',
+    'easy_thumbnails',
+    'cmsplugin_filer_file',
+    'cmsplugin_filer_folder',
+    'cmsplugin_filer_image',
+    'cmsplugin_filer_teaser',
+    'cmsplugin_filer_video',
+)
+
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS # + LOCAL_APPS
+if PRJ_ENABLE_CMS:
+    INSTALLED_APPS += CMS_APPS
+INSTALLED_APPS += LOCAL_APPS
 
 # Import settings specific to a plugged set of applications
 settings_path = join(DJANGO_ROOT, 'settings')
@@ -281,3 +309,45 @@ DBBACKUP_DROPBOX_DIRECTORY = PRJ_NAME
 DBBACKUP_MEDIA_PATH = MEDIA_ROOT
 DBBACKUP_CLEANUP_KEEP = 3
 ########## END BACKUP CONFIGURATION
+
+if PRJ_ENABLE_CMS:
+    CMS_TEMPLATES = (
+        ('homepage.html', 'Homepage'),
+    )
+
+    CMS_LANGUAGES = {
+        #1: [
+        #    {
+        #        'code': 'it',
+        #        'name': 'Italiano',
+        #        #'fallbacks': ['de', 'fr'],
+        #        'public': True,
+        #        'hide_untranslated': True,
+        #        'redirect_on_fallback':False,
+        #    },
+        #    # {
+        #    #     'code': 'de',
+        #    #     'name': gettext('Deutsch'),
+        #    #     'fallbacks': ['en', 'fr'],
+        #    #     'public': True,
+        #    # },
+        #    # {
+        #    #     'code': 'fr',
+        #    #     'name': gettext('French'),
+        #    #     'public': False,
+        #    # },
+        #],
+        'default': {
+            'code': 'it',
+            'name': 'Italiano',
+            #'fallbacks': ['de', 'fr'],
+            'public': True,
+            'hide_untranslated': True,
+            'redirect_on_fallback': False,
+
+            #'fallbacks': ['it',],
+            #'redirect_on_fallback':True,
+            #'public': True,
+            #'hide_untranslated': True,
+        }
+    }

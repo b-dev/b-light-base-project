@@ -57,6 +57,11 @@ if __name__ == '__main__':
     if len(PRJ_ADDR_TEST.strip()) == 0:
         PRJ_ADDR_TEST = ''
 
+    PRJ_ENABLE_CMS = raw_input(u"Vuoi abilitare il modulo del cms ? (y/n) \n")
+    FLAG_ENABLE_CMS = 'FALSE'
+    if PRJ_ENABLE_CMS in ('y', 'yes', 'Y', 'YES'):
+        FLAG_ENABLE_CMS = 'TRUE'
+
     _replace_in_file(PRJ_ROOT, 'Vagrantfile',
                              {
                                  'PRJ_NAME' : PRJ_NAME,
@@ -90,6 +95,7 @@ if __name__ == '__main__':
         '\nexport PRJ_DEB_UPGRADE=TRUE',
         '\nexport PRJ_PIP_UPGRADE=TRUE',
         '\nexport PRJ_ASSETS_UPGRADE=TRUE',
+        '\nexport PRJ_ENABLE_CMS=%s' % FLAG_ENABLE_CMS,
         ]
     for plugged_app_label in sys.argv[2:]:
         env_file_lines.append('\nexport PRJ_IS_%s=TRUE' % plugged_app_label.upper())
