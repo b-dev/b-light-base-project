@@ -70,8 +70,7 @@ if the base vagrant image has already additions installed an error could be thro
     sudo dpkg --purge virtualbox-guest-utils virtualbox-guest-x11
     sudo apt-get autoremove
     exit
-    vagrant halt
-    vagrant up
+    vagrant reload --provision
 
 
 When deploying:

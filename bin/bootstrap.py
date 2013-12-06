@@ -38,7 +38,7 @@ if __name__ == '__main__':
     if len(PRJ_PASS.strip()) == 0:
         PRJ_PASS = PRJ_USER
 
-    CREATE_DB = raw_input(u"you want the db created locally by me ?\n[y/n]\n(if you plan to use vagrant say no, we'll create it on the guest lately)\n")
+    CREATE_DB = raw_input(u"you want the db created locally by me ?\n(if you plan to use vagrant say no, we'll create it on the guest later)\n[y/n]\n")
     if CREATE_DB in ('y', 'yes', 'Y', 'YES'):
         process = subprocess.Popen('export PGPASSWORD=%s && createdb -U %s -h localhost %s' % (PRJ_PASS, PRJ_USER, PRJ_DB,),
                                    shell=True, executable="/bin/bash")
@@ -86,7 +86,6 @@ if __name__ == '__main__':
         '\nexport PRJ_PASS=%s' % PRJ_PASS,
         '\nexport PRJ_SECRET_KEY="%s"' % "".join([random.choice(
          "abcdefghijklmnopqrstuvwxyz0123456789!@#%^&*(-_+)") for i in range(50)]),
-        '\nexport PRJ_GIT_REPO=%s' % PRJ_GIT_REPO,
         '\nexport PRJ_ADDR_STAGING=%s' % PRJ_ADDR_STAGING,
         '\nexport PRJ_ADDR_PRODUCTION=%s' % PRJ_ADDR_PRODUCTION,
         '\nexport PRJ_ADDR_TEST=%s' % PRJ_ADDR_TEST,
@@ -97,9 +96,6 @@ if __name__ == '__main__':
         ]
     for plugged_app_label in sys.argv[2:]:
         env_file_lines.append('\nexport PRJ_IS_%s=TRUE' % plugged_app_label.upper())
-
-    with open(os.path.join(REPO_ROOT, '.env'), 'w') as env_file:
-        env_file.writelines(env_file_lines)
 
     INIT_GIT = raw_input(u"you just cloned the template project ? (I will remove current git config and create it from scratch in that case) \n[y/n]\n")
     if INIT_GIT in ('y', 'yes', 'Y', 'YES'):
@@ -112,10 +108,14 @@ if __name__ == '__main__':
         process = subprocess.Popen('cd %s && git init' % PRJ_ROOT, shell=True, executable="/bin/bash")
         while process.poll() == None: pass
         PRJ_GIT_REPO = raw_input(u"repo url for the project ? \n")
-        _replace_in_file(PRJ_ROOT, {'PRJ_GIT_REPO' : PRJ_GIT_REPO})
+        _replace_in_file(PRJ_ROOT, 'Vagrantfile', {'PRJ_GIT_REPO' : PRJ_GIT_REPO})
 
         if PRJ_GIT_REPO:
             process = subprocess.Popen('cd %s && git remote add origin %s' % (PRJ_ROOT, PRJ_GIT_REPO),
                                        shell=True, executable="/bin/bash")
             while process.poll() == None: pass
         subprocess.Popen('cd %s && git add .' % PRJ_ROOT, shell=True, executable="/bin/bash")
+
+    env_file_lines.append('\nexport PRJ_GIT_REPO=%s' % PRJ_GIT_REPO)
+    with open(os.path.join(REPO_ROOT, '.env'), 'w') as env_file:
+        env_file.writelines(env_file_lines)
