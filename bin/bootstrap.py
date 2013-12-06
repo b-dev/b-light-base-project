@@ -38,12 +38,10 @@ if __name__ == '__main__':
     if len(PRJ_PASS.strip()) == 0:
         PRJ_PASS = PRJ_USER
 
-    CREATE_DB = raw_input(u"vuoi creare il database?\n[y/n]\n")
+    CREATE_DB = raw_input(u"you want the db created locally by me ?\n[y/n]\n(if you plan to use vagrant say no, we'll create it on the guest lately)\n")
     if CREATE_DB in ('y', 'yes', 'Y', 'YES'):
-        process = subprocess.Popen('export PGPASSWORD=%s && createdb -U %s -h localhost %s' % (PRJ_PASS, PRJ_USER, PRJ_DB,), shell=True,
-                                   executable="/bin/bash")
-
-    PRJ_GIT_REPO = raw_input(u"repo url for the project ? \n")
+        process = subprocess.Popen('export PGPASSWORD=%s && createdb -U %s -h localhost %s' % (PRJ_PASS, PRJ_USER, PRJ_DB,),
+                                   shell=True, executable="/bin/bash")
 
     PRJ_ADDR_STAGING = raw_input(u"staging server address ? (can be left empty and filled in the .env file later) \n")
     if len(PRJ_ADDR_STAGING.strip()) == 0:
@@ -57,7 +55,7 @@ if __name__ == '__main__':
     if len(PRJ_ADDR_TEST.strip()) == 0:
         PRJ_ADDR_TEST = ''
 
-    PRJ_ENABLE_CMS = raw_input(u"Vuoi abilitare il modulo del cms ? (y/n) \n")
+    PRJ_ENABLE_CMS = raw_input(u"you want cms module enabled ? (y/n) \n")
     FLAG_ENABLE_CMS = 'FALSE'
     if PRJ_ENABLE_CMS in ('y', 'yes', 'Y', 'YES'):
         FLAG_ENABLE_CMS = 'TRUE'
@@ -70,7 +68,6 @@ if __name__ == '__main__':
                                  'PRJ_DB' : PRJ_DB,
                                  'PRJ_USER' : PRJ_USER,
                                  'PRJ_PASS' : PRJ_PASS,
-                                 'PRJ_GIT_REPO' : PRJ_GIT_REPO,
                                  'PRJ_ADDR_STAGING' : PRJ_ADDR_STAGING,
                                  'PRJ_ADDR_PRODUCTION' : PRJ_ADDR_PRODUCTION,
                                  'PRJ_ADDR_TEST' : PRJ_ADDR_TEST,
@@ -114,6 +111,9 @@ if __name__ == '__main__':
         while process.poll() == None: pass
         process = subprocess.Popen('cd %s && git init' % PRJ_ROOT, shell=True, executable="/bin/bash")
         while process.poll() == None: pass
+        PRJ_GIT_REPO = raw_input(u"repo url for the project ? \n")
+        _replace_in_file(PRJ_ROOT, {'PRJ_GIT_REPO' : PRJ_GIT_REPO})
+
         if PRJ_GIT_REPO:
             process = subprocess.Popen('cd %s && git remote add origin %s' % (PRJ_ROOT, PRJ_GIT_REPO),
                                        shell=True, executable="/bin/bash")

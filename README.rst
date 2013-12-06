@@ -22,7 +22,8 @@ To deploy this application, you need to follow these steps:
 Local deployment::
 
     git clone git@github.com:marcominutoli/b-light-base-project.git [project_name]
-    cd [project_name]
+    cd [project_name]/bin
+    python bootstrap.py [env_type]
 
 default for the project environment is 'dev', environment types are:
 
@@ -30,11 +31,6 @@ default for the project environment is 'dev', environment types are:
  * 'test' ( todo description )
  * 'staging' ( todo description )
  * 'production' ( todo description )
-
-'pluggable apps groups' are sets of deploy actions on the vagrant machine and python apps installed as part of the base project.
-currently the groups are:
-
- * 'webapp' : installs redis server and configures in the django project django-rest-framework
 
 
 If not using Vagrant:
@@ -52,6 +48,8 @@ If using Vagrant:
 -----------------
 
 ( note that currently VirtualBox 4.2.14 seems bugged and will fail when importing the vagrant box )::
+::
+
     vagrant plugin install vagrant-vbguest  ( just the first time )
     cd ..
     vagrant up
@@ -60,16 +58,31 @@ This initialize a virtual machine with a user 'django' (password 'django') provi
 Debian packages are kept upgraded by the provisioning as long PRJ_DEB_UPGRADE=TRUE in .env file.
 The same for Pip packages in the virtualenv with PRJ_PIP_UPGRADE=TRUE.
 
+The vagrant-vbguest plugin will keep VirtualBox Guest Additions up to date on the VM,
+if the base vagrant image has already additions installed an error could be thrown, in that case you should vagrant ssh and :
+::
+
+    sudo apt-get remove virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11
+    sudo dpkg --purge virtualbox-guest-utils virtualbox-guest-x11
+    sudo apt-get autoremove
+    exit
+    vagrant halt
+    vagrant up
+
 
 When deploying:
 ---------------
 
 TODO
 
-Making your own pluggable app group
+Adding a pluggable app group
 -----------------------------------
 
-TODO
+'pluggable apps groups' are sets of deploy actions on the vagrant machine and python apps installed as part of the base project.
+currently the groups are:
+
+ * 'webapp' : installs redis server and configures in the django project django-rest-framework
+
 
 ================
 Acknowledgements
