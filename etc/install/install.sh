@@ -67,10 +67,16 @@ fi
 if ! command -v pip; then
     easy_install -U pip
 fi
-if [[ ! -f /usr/local/bin/virtualenv ]]; then
-    easy_install virtualenv stevedore virtualenv-clone virtualenvwrapper
-fi
 
+if [[ ! -f /usr/local/bin/virtualenv ]]; then
+    easy_install virtualenv
+fi
+# this breaks too much times in the middle of install,
+#   always ends with virtualenv installed but no wrapper...
+# we easy_install each package separately
+easy_install stevedore
+easy_install virtualenv-clone
+easy_install virtualenvwrapper
 
 # Bash environment global setup
 cp -p $PROJECT_DIR/etc/install/bashrc /home/django/.bashrc
@@ -104,3 +110,5 @@ su - django -c "source /usr/local/bin/virtualenvwrapper.sh && workon $PRJ_NAME &
 su - django -c "source $VIRTUALENV_DIR/bin/activate && fab -f /vagrant/fabfile.py $PRJ_ENV plug_all"
 su - django -c "source /usr/local/bin/virtualenvwrapper.sh && workon $PRJ_NAME && fab bower"
 su - django -c "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && python website/manage.py syncdb --all --noinput && python website/manage.py migrate --fake"
+
+exit 0
