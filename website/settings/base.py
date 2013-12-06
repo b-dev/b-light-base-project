@@ -28,7 +28,7 @@ PRJ_PASS = environ['PRJ_PASS']
 PRJ_SECRET_KEY = environ['PRJ_SECRET_KEY']
 PRJ_ENABLE_CMS = False
 if environ['PRJ_ENABLE_CMS'] == 'TRUE':
-    PRJ_ENABLE_CMS = False
+    PRJ_ENABLE_CMS = True
 
 # Site name:
 SITE_NAME = basename(SITE_ROOT)
