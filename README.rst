@@ -19,6 +19,25 @@ Deployment
 To deploy this application, you need to follow these steps:
 -----------------------------------------------------------
 
+If not using Vagrant:
+---------------------
+
+Local deployment::
+
+    git clone git@github.com:marcominutoli/b-light-base-project.git [project_name]
+
+::
+
+    mkvirtualenv [project_name]
+    add2virtualenv .
+    add2virtualenv website
+    add2virtualenv external_apps
+    make project_setup
+
+
+If using Vagrant:
+-----------------
+
 Local deployment::
 
     git clone git@github.com:marcominutoli/b-light-base-project.git [project_name]
@@ -31,21 +50,6 @@ default for the project environment is 'dev', environment types are:
  * 'test' ( todo description )
  * 'staging' ( todo description )
  * 'production' ( todo description )
-
-
-If not using Vagrant:
----------------------
-::
-
-    mkvirtualenv [project_name]
-    add2virtualenv .
-    add2virtualenv website
-    add2virtualenv external_apps
-    make project_setup
-
-
-If using Vagrant:
------------------
 
 ( note that currently VirtualBox 4.2.14 seems bugged and will fail when importing the vagrant box )::
 ::
