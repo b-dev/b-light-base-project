@@ -107,7 +107,7 @@ if __name__ == '__main__':
         while process.poll() == None: pass
         process = subprocess.Popen('cd %s && git init' % PRJ_ROOT, shell=True, executable="/bin/bash")
         while process.poll() == None: pass
-        PRJ_GIT_REPO = raw_input(u"repo url for the project ? \n")
+        PRJ_GIT_REPO = raw_input(u"repo url for the project ? (can be left empty and configured in git later) \n")
         _replace_in_file(PRJ_ROOT, 'Vagrantfile', {'PRJ_GIT_REPO' : PRJ_GIT_REPO})
 
         if PRJ_GIT_REPO:
