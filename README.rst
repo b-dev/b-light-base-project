@@ -16,13 +16,12 @@ Deployment is made with Gunicorn and Nginx.
 Deployment
 ================
 
-To deploy this application, you need to follow these steps:
------------------------------------------------------------
+To locally deploy this template into a new project, you need to follow these steps:
+-----------------------------------------------------------------------------------
 
 If not using Vagrant:
 ---------------------
-
-Local deployment::
+::
 
     git clone git@github.com:marcominutoli/b-light-base-project.git [project_name]
 
@@ -37,14 +36,16 @@ Local deployment::
 
 If using Vagrant:
 -----------------
-
-Local deployment::
+::
 
     git clone git@github.com:marcominutoli/b-light-base-project.git [project_name]
+
+::
+
     cd [project_name]/bin
     python bootstrap.py [env_type]
 
-default for the project environment is 'dev', environment types are:
+default for the project environment is 'dev', 'make project_setup' will deploy as dev, environment types are:
 
  * 'dev' ( the usual stuff; embedded static files serving, debug toolbar, django extensions )
  * 'test' ( todo description )
