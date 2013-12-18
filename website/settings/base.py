@@ -1,37 +1,24 @@
 """Common settings and globals."""
-from os import environ, mkdir
-from os.path import abspath, basename, dirname, join, normpath, isfile, exists
-from os import listdir
-import imp
-
+import os
 
 ugettext = lambda s: s
 
-
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
-DJANGO_ROOT = dirname(dirname(abspath(__file__)))
+WEBSITE_ROOT = os.path.dirname(os.path.dirname(__file__))
 
 # Absolute filesystem path to the top-level project folder:
-SITE_ROOT = dirname(DJANGO_ROOT)
+PROJECT_ROOT = os.path.dirname(WEBSITE_ROOT)
 
 from _set_local_env_vars import import_env_vars
-import_env_vars(SITE_ROOT)
+import_env_vars(PROJECT_ROOT)
 
-PRJ_ENV = environ['PRJ_ENV']
-PRJ_NAME = environ['PRJ_NAME']
-PRJ_ENGINE = environ['PRJ_ENGINE']
-PRJ_DB = environ['PRJ_DB']
-PRJ_DB_HOST = environ['PRJ_DB_HOST']
-PRJ_USER = environ['PRJ_USER']
-PRJ_PASS = environ['PRJ_PASS']
-PRJ_SECRET_KEY = environ['PRJ_SECRET_KEY']
+PRJ_ENV = os.environ['PRJ_ENV']
 PRJ_ENABLE_CMS = False
-if environ['PRJ_ENABLE_CMS'] == 'TRUE':
-    PRJ_ENABLE_CMS = True
+PRJ_ENABLE_WEBAPP = False
 
 # Site name:
-SITE_NAME = basename(SITE_ROOT)
+SITE_NAME = os.path.basename(PROJECT_ROOT)
 ########## END PATH CONFIGURATION
 
 
@@ -58,17 +45,13 @@ MANAGERS = ADMINS
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-if PRJ_ENGINE == 'sqlite3':
-    dbname = normpath(join(DJANGO_ROOT, 'default.db'))
-else:
-    dbname = PRJ_DB
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.%s' % PRJ_ENGINE,
-        'NAME': dbname,
-        'USER': PRJ_USER,
-        'PASSWORD': PRJ_PASS,
-        'HOST': PRJ_DB_HOST,
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ['PRJ_DB_NAME'],
+        'USER': os.environ['PRJ_DB_USER'],
+        'PASSWORD': os.environ['PRJ_DB_PASSWORD'],
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
@@ -98,7 +81,7 @@ USE_TZ = True
 
 ########## MEDIA CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-MEDIA_ROOT = normpath(join(DJANGO_ROOT, 'media'))
+MEDIA_ROOT = os.path.normpath(os.path.join(WEBSITE_ROOT, 'media'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = '/media/'
@@ -107,14 +90,14 @@ MEDIA_URL = '/media/'
 
 ########## STATIC FILE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-STATIC_ROOT = normpath(join(DJANGO_ROOT, 'assets'))
+STATIC_ROOT = os.path.normpath(os.path.join(WEBSITE_ROOT, 'assets'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = '/static/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
-    normpath(join(DJANGO_ROOT, 'static')),
+    os.path.normpath(os.path.join(WEBSITE_ROOT, 'static')),
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
@@ -128,7 +111,7 @@ STATICFILES_FINDERS = (
 ########## SECRET CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key only used for development and testing.
-SECRET_KEY = PRJ_SECRET_KEY
+SECRET_KEY = os.environ['PRJ_SECRET_KEY']
 ########## END SECRET CONFIGURATION
 
 
@@ -142,7 +125,7 @@ ALLOWED_HOSTS = []
 ########## FIXTURE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-FIXTURE_DIRS
 FIXTURE_DIRS = (
-    normpath(join(SITE_ROOT, 'fixtures')),
+    os.path.normpath(os.path.join(WEBSITE_ROOT, 'fixtures')),
 )
 ########## END FIXTURE CONFIGURATION
 
@@ -171,7 +154,7 @@ TEMPLATE_LOADERS = (
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
 TEMPLATE_DIRS = (
-    normpath(join(DJANGO_ROOT, 'templates')),
+    os.path.normpath(os.path.join(WEBSITE_ROOT, 'templates')),
 )
 ########## END TEMPLATE CONFIGURATION
 
@@ -180,8 +163,8 @@ TEMPLATE_DIRS = (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
 MIDDLEWARE_CLASSES = [
     # Default Django middleware.
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -216,9 +199,8 @@ DJANGO_APPS = (
     # Useful template tags:
     # 'django.contrib.humanize',
 
-    # Admin panel and documentation:
+    # Admin panel:
     'django.contrib.admin',
-    # 'django.contrib.admindocs',
 )
 
 THIRD_PARTY_APPS = (
@@ -249,31 +231,29 @@ CMS_APPS = (
     'cmsplugin_filer_video',
 )
 
+WEBAPPS_APPS = (
+    'rest_framework',
+)
+
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS # + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS
+
+# Add extra settings apps
 if PRJ_ENABLE_CMS:
     INSTALLED_APPS += CMS_APPS
+
+if PRJ_ENABLE_WEBAPP:
+    INSTALLED_APPS += WEBAPPS_APPS
+
+# Add local apps at the end of INSTALLED_APPS
 INSTALLED_APPS += LOCAL_APPS
-
-# Import settings specific to a plugged set of applications
-settings_path = join(DJANGO_ROOT, 'settings')
-plugged_settings_files = [ f for f in listdir(settings_path) if
-                           ( isfile(join(settings_path, f)) and f[0:5] == 'plug_' and f[-3:] == '.py') ]
-for f in plugged_settings_files:
-    name = f[5:-3]
-    if environ.get('PRJ_IS_%s' % name.upper(), 'FALSE') == 'TRUE':
-        plugged_settings = imp.load_source(f, join(settings_path, f))
-        INSTALLED_APPS += plugged_settings.PLUG_INSTALLED_APPS
-        for name in getattr(plugged_settings, 'PLUGGED_CONFIGS', []):
-            globals()[name] = getattr(plugged_settings, name)
-
 ########## END APP CONFIGURATION
 
-LOG_ROOT = normpath(join(SITE_ROOT, 'logs'))
+LOG_ROOT = os.path.normpath(os.path.join(PROJECT_ROOT, 'logs'))
 
 # Ensure log root exists
-if not exists(LOG_ROOT):
-    mkdir(LOG_ROOT)
+if not os.path.exists(LOG_ROOT):
+    os.mkdir(LOG_ROOT)
 
 ########## LOGGING CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
@@ -313,49 +293,13 @@ DBBACKUP_TOKENS_FILEPATH = 'xxx'
 DBBACKUP_DROPBOX_APP_KEY = 'xxx'
 DBBACKUP_DROPBOX_APP_SECRET = 'xxx'
 DBBACKUP_DROPBOX_ACCESS_TYPE = 'app_folder'
-DBBACKUP_DROPBOX_DIRECTORY = PRJ_NAME
+DBBACKUP_DROPBOX_DIRECTORY = '%%PRJ_NAME%%'
 DBBACKUP_MEDIA_PATH = MEDIA_ROOT
 DBBACKUP_CLEANUP_KEEP = 3
 ########## END BACKUP CONFIGURATION
 
+# Import custom extra apps settings
 if PRJ_ENABLE_CMS:
-    CMS_TEMPLATES = (
-        ('homepage.html', 'Homepage'),
-    )
-
-    CMS_LANGUAGES = {
-        #1: [
-        #    {
-        #        'code': 'it',
-        #        'name': 'Italiano',
-        #        #'fallbacks': ['de', 'fr'],
-        #        'public': True,
-        #        'hide_untranslated': True,
-        #        'redirect_on_fallback':False,
-        #    },
-        #    # {
-        #    #     'code': 'de',
-        #    #     'name': gettext('Deutsch'),
-        #    #     'fallbacks': ['en', 'fr'],
-        #    #     'public': True,
-        #    # },
-        #    # {
-        #    #     'code': 'fr',
-        #    #     'name': gettext('French'),
-        #    #     'public': False,
-        #    # },
-        #],
-        'default': {
-            'code': 'it',
-            'name': 'Italiano',
-            #'fallbacks': ['de', 'fr'],
-            'public': True,
-            'hide_untranslated': True,
-            'redirect_on_fallback': False,
-
-            #'fallbacks': ['it',],
-            #'redirect_on_fallback':True,
-            #'public': True,
-            #'hide_untranslated': True,
-        }
-    }
+    from website.settings.apps.cms import *
+if PRJ_ENABLE_WEBAPP:
+    from website.settings.apps.webapp import *

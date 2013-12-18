@@ -1,6 +1,6 @@
 ### COMMON REQUIREMENTS ###
 # Django base
-django>=1.5,<1.6
+django>=1.6,<1.7
 ipython>=0.13.1,<0.14
 South==0.8.1
 
@@ -23,3 +23,11 @@ python-dateutil
 
 # We don't want a different db even in development
 psycopg2==2.5
+
+Sphinx==1.1.2
+django-debug-toolbar
+Werkzeug
+django-extensions
+line_profiler==1.0b3
+
+gunicorn

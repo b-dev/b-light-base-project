@@ -9,9 +9,9 @@ def import_env_vars(project_root):
     try:
         envfile = open(project_root+'.env')
     except IOError:
-        raise Exception("You must have a .env file in your project root "
-                        "in order to run the server in your local machine. "
-                        "This specifies some necessary environment variables. ")
+        # If there isn't an env file don't raise any error. Maybe you override settings by the local.py file
+        return
+
     for line in envfile.readlines():
         if len(line) > 1 and not line[0:1] == '#':
             [key,value] = line.replace('export ', '').strip().split("=")

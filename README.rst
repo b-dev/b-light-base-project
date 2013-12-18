@@ -4,38 +4,39 @@ D-light base project
 
 A complete skeleton for Django projects, using:
 -----------------------------------------------
-* Django 1.5
+* Django 1.6
 * Pip in virtualenv(wrapper)
 * Bower
 
-Project is configured to use Vagrant (1.2.2) on VirtualBox (4.2.12) during development, tested with PyCharm on Ubuntu and MacOSX.
+Project also have a configuration to use Vagrant (1.2.2) on VirtualBox (4.2.12) during development, tested with PyCharm on Ubuntu and MacOSX.
 Deployment is made with Gunicorn and Nginx.
 
 
-================
-Deployment
-================
+==================================
+Local Development without Vagrant
+==================================
 
 To locally deploy this template into a new project, you need to follow these steps:
 -----------------------------------------------------------------------------------
 
-If not using Vagrant:
----------------------
 ::
 
     git clone git@github.com:marcominutoli/b-light-base-project.git [project_name]
 
 ::
 
+    cd [project_name]
     mkvirtualenv [project_name]
-    add2virtualenv .
-    add2virtualenv website
-    add2virtualenv external_apps
     make project_setup
 
 
-If using Vagrant:
------------------
+==================================
+Local Development with Vagrant
+==================================
+
+To locally deploy this template into a new project with Vagrant, you need to follow these steps:
+------------------------------------------------------------------------------------------------
+
 ::
 
     git clone git@github.com:marcominutoli/b-light-base-project.git [project_name]
@@ -45,7 +46,7 @@ If using Vagrant:
     cd [project_name]/bin
     python bootstrap.py [env_type]
 
-default for the project environment is 'dev', 'make project_setup' will deploy as dev, environment types are:
+env_type choices are:
 
  * 'dev' ( the usual stuff; embedded static files serving, debug toolbar, django extensions )
  * 'test' ( todo description )
