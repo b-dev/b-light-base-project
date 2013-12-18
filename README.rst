@@ -4,8 +4,9 @@ D-light base project
 
 A complete skeleton for Django projects, using:
 -----------------------------------------------
-* Django 1.6
-* Pip in virtualenv(wrapper)
+* Django 1.5
+* Pip
+* virtualenv and virtualenvwrapper
 * Bower
 
 Project also have a configuration to use Vagrant (1.2.2) on VirtualBox (4.2.12) during development, tested with PyCharm on Ubuntu and MacOSX.
