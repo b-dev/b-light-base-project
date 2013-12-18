@@ -12,7 +12,7 @@ import_env_vars(PROJECT_ROOT)
 PRJ_ENV = os.environ['PRJ_ENV']
 PRJ_NAME = '%%PRJ_NAME%%'
 
-PRJ_GIT_REPO = os.environ.get('PRJ_GIT_REPO', '')
+PRJ_GIT_REPO = os.getenv('PRJ_GIT_REPO')
 
 ENVIRONMENTS = {
     'dev': ['127.0.0.1'],
