@@ -3,32 +3,23 @@ from os.path import abspath, dirname, isfile
 
 from fabric.api import *
 from fabric.contrib.files import append, exists
-from fabtools import require
-import fabtools
 
-SITE_ROOT = dirname(abspath(__file__))
+PROJECT_ROOT = dirname(abspath(__file__))
 
 from _set_local_env_vars import import_env_vars
-import_env_vars(SITE_ROOT)
+import_env_vars(PROJECT_ROOT)
 
 PRJ_ENV = os.environ['PRJ_ENV']
-PRJ_NAME = os.environ['PRJ_NAME']
-PRJ_DB = os.environ['PRJ_DB']
-PRJ_USER = os.environ['PRJ_USER']
-PRJ_PASS = os.environ['PRJ_PASS']
+PRJ_NAME = '%%PRJ_NAME%%'
 
 PRJ_GIT_REPO = os.environ['PRJ_GIT_REPO']
-PRJ_ADDR_STAGING = os.environ['PRJ_ADDR_STAGING']
-PRJ_ADDR_PRODUCTION = os.environ['PRJ_ADDR_PRODUCTION']
-PRJ_ADDR_TEST = os.environ['PRJ_ADDR_TEST']
 
 ENVIRONMENTS = {
     'dev': ['127.0.0.1'],
-    'staging': PRJ_ADDR_STAGING,
-    'production': PRJ_ADDR_PRODUCTION,
-    'test': PRJ_ADDR_TEST,
+    'staging': '',
+    'production': '',
+    'test': '',
 }
-
 
 env.user = 'django'
 
@@ -75,17 +66,17 @@ def test():
     env.name = 'production'
     env.hosts = ENVIRONMENTS[env.name]
 
-@task
-def configure_db():
-    if env.name == 'dev':
-        from sh import createuser, createdb
-        #todo untested
-        createuser("-Upostgres -d -R -S %s" % PRJ_USER)
-        createdb ("-Upostgres -O%s %s" % PRJ_USER, PRJ_DB)
-    else:
-        require.postgres.server()
-        require.postgres.user(PRJ_USER, PRJ_PASS)
-        require.postgres.database(PRJ_DB, PRJ_USER)
+# @task
+# def configure_db():
+#     if env.name == 'dev':
+#         from sh import createuser, createdb
+#         #todo untested
+#         createuser("-Upostgres -d -R -S %s" % PRJ_DB_USER)
+#         createdb ("-Upostgres -O%s %s" % PRJ_USER, PRJ_DB)
+#     else:
+#         require.postgres.server()
+#         require.postgres.user(PRJ_USER, PRJ_PASS)
+#         require.postgres.database(PRJ_DB, PRJ_USER)
 
 @task
 def setup():
@@ -95,68 +86,48 @@ def setup():
 @task
 def bower():
     from sh import bower
-    pah = os.path.join(SITE_ROOT, 'requirements', 'clientside.txt')
+    pah = os.path.join(PROJECT_ROOT, 'requirements', 'clientside.txt')
     with open(pah, 'r') as reqfile:
         for line in reqfile:
             bower.install(line.strip())
 
+
 @task
 def plug_prerequisites(name):
     env.user = 'vagrant'
-    pah = os.path.join(SITE_ROOT, 'etc', 'install', 'plug_%s.pkg' % name)
+    path = os.path.join(PROJECT_ROOT, 'etc', 'install', 'plug_%s.pkg' % name)
     packages_to_install = []
-    with open(pah, 'r') as pkgs_file:
+    if not os.path.exists(path):
+        return
+    with open(path, 'r') as pkgs_file:
         lines = pkgs_file.readlines()
         for line in lines:
             if len(line) and not line[0:1] == '#':
                 packages_to_install.append(line.strip())
     require.deb.packages(packages_to_install)
 
-@task
-def plug_packages(name):
-    from sh import pip
-    for line in pip.install('-r%s/requirements/plug_%s.txt' % (SITE_ROOT, name), _iter=True):
-        print line
-
-
-def set_plug_active(name, pah=os.path.join(SITE_ROOT, '.env')):
-    templines = []
-    with open(pah, 'r') as envfile:
-        lines = envfile.readlines()
-        found = False
-        for line in lines:
-            if line.find('export PRJ_IS_%s=' % name.upper()) == 0:
-                if line.find('TRUE') == 0:
-                    templines.append(line)
-                else:
-                    templines.append(line.replace('FALSE', 'TRUE'))
-                found = True
-            else:
-                templines.append(line)
-        if not found:
-            templines.append('\nexport PRJ_IS_%s=TRUE' % name.upper())
-    with open(pah, 'w') as newfile:
-        newfile.writelines(templines)
 
 @task
 def plug(name):
-    set_plug_active(name)
-    # replace_or_append('export PRJ_IS_%s=FALSE' % name.upper(), 'export PRJ_IS_%s=TRUE' % name.upper(), pah)
-    # replace_or_append('export PRJ_IS_%s=TRUE' % name.upper(), 'export PRJ_IS_%s=TRUE' % name.upper(), pah)
+    # TODO : da riabilitare perche' mi da errore che non trova fabtools (e non voglio installarlo globalmente)
+    # plug_prerequisites(name)
 
+    with prefix(". /usr/local/bin/virtualenvwrapper.sh; workon %s" % PRJ_NAME):
+        local("pip install -r %s/requirements/apps/%s.txt" % (PROJECT_ROOT, name))
 
-    plug_prerequisites(name)
-    plug_packages(name)
+        # Enable the plugged app inside the settings
+        lines = []
+        app_enabled = False
+        for line in open(os.path.join(PROJECT_ROOT, 'website', 'settings', 'base.py'), 'r').readlines():
+            if line.find('PRJ_ENABLE_%s = False' % name.upper()) > -1:
+                line = 'PRJ_ENABLE_%s = True\n' % name.upper()
+                app_enabled = True
+            lines.append(line)
 
-
-@task
-def plug_all():
-    for key, val in os.environ.items():
-        if key[0:7] == 'PRJ_IS_' and val == 'TRUE':
-            name = key[7:].lower()
-            print "plugging '%s' apps group" % name
-            plug_prerequisites(name)
-            plug_packages(name)
+        # Rewrite the correct settings file with appname enabled (only if it was enabled)
+        if app_enabled:
+            new_settings = open(os.path.join(PROJECT_ROOT, 'website', 'settings', 'base.py'), 'w')
+            new_settings.writelines(lines)
 
 
 @task

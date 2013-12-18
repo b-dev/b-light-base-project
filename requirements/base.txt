@@ -1,6 +1,6 @@
 ### COMMON REQUIREMENTS ###
 # Django base
-django>=1.6,<1.7
+django>=1.5,<1.6
 ipython>=0.13.1,<0.14
 South==0.8.1
 

@@ -30,6 +30,21 @@ To locally deploy this template into a new project, you need to follow these ste
     make project_setup
 
 
+Add external (included) apps to the project
+-------------------------------------------
+
+There are two 'pre-installed' apps inside the base project: the CMS apps and the WEBAPP apps.
+The CMS apps enable 'django-cms' apps and the relative settings.
+The WEBAPP enable the 'django-rest-framework' apps, so you can easly expose your api to the web.
+
+To enable these apps run the following command:
+
+::
+
+    fab plug cms # for the CMS apps
+    fab plug webapp # for the WEBAPP apps
+
+
 ==================================
 Local Development with Vagrant
 ==================================
