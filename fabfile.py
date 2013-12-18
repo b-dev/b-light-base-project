@@ -12,7 +12,7 @@ import_env_vars(PROJECT_ROOT)
 PRJ_ENV = os.environ['PRJ_ENV']
 PRJ_NAME = '%%PRJ_NAME%%'
 
-PRJ_GIT_REPO = os.environ['PRJ_GIT_REPO']
+PRJ_GIT_REPO = os.environ.get('PRJ_GIT_REPO', '')
 
 ENVIRONMENTS = {
     'dev': ['127.0.0.1'],
@@ -128,6 +128,9 @@ def plug(name):
         if app_enabled:
             new_settings = open(os.path.join(PROJECT_ROOT, 'website', 'settings', 'base.py'), 'w')
             new_settings.writelines(lines)
+
+        local("python %s/website/manage.py syncdb --all" % PROJECT_ROOT)
+        local("python %s/website/manage.py migrate --fake" % PROJECT_ROOT)
 
 
 @task

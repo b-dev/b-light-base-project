@@ -34,16 +34,19 @@ Add external (included) apps to the project
 -------------------------------------------
 
 There are two 'pre-installed' apps inside the base project: the CMS apps and the WEBAPP apps.
-The CMS apps enable 'django-cms' apps and the relative settings.
-The WEBAPP enable the 'django-rest-framework' apps, so you can easly expose your api to the web.
 
+* 'cms'    : install django-cms and the django filer utility.
+* 'webapp' : installs redis server and django-rest-framework apps, so you can easly expose your api to the web.
+
+There are disabled by default.
 To enable these apps run the following command:
 
 ::
 
-    fab plug cms # for the CMS apps
-    fab plug webapp # for the WEBAPP apps
+    fab plug cms # to enable the CMS apps
+    fab plug webapp # to enable the WEBAPP apps
 
+Now you can run "runserver" and browse yoour app :-)
 
 ==================================
 Local Development with Vagrant
@@ -94,14 +97,6 @@ When deploying:
 ---------------
 
 TODO
-
-Adding a pluggable app group
------------------------------------
-
-'pluggable apps groups' are sets of deploy actions on the vagrant machine and python apps installed as part of the base project.
-currently the groups are:
-
- * 'webapp' : installs redis server and configures in the django project django-rest-framework
 
 
 ================
