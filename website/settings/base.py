@@ -1,6 +1,6 @@
 """Common settings and globals."""
-from os import environ
-from os.path import abspath, basename, dirname, join, normpath, isfile
+from os import environ, mkdir
+from os.path import abspath, basename, dirname, join, normpath, isfile, exists
 from os import listdir
 import imp
 
@@ -269,6 +269,11 @@ for f in plugged_settings_files:
 
 ########## END APP CONFIGURATION
 
+LOG_ROOT = normpath(join(SITE_ROOT, 'logs'))
+
+# Ensure log root exists
+if not exists(LOG_ROOT):
+    mkdir(LOG_ROOT)
 
 ########## LOGGING CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
