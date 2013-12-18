@@ -22,29 +22,8 @@ ENVIRONMENTS = {
 }
 
 env.user = 'django'
-
-# sshagent_run credits to http://lincolnloop.com/blog/2009/sep/22/easy-fabric-deployment-part-1-gitmercurial-and-ssh/
-# modified by dvd :)
-def sshagent_run(cmd, capture=True):
-    """
-    Helper function.
-    Runs a command with SSH agent forwarding enabled.
-
-    Note:: Fabric (and paramiko) can't forward your SSH agent.
-    This helper uses your system's ssh to do so.
-    """
-    cwd = env.get('cwd', '')
-    if cwd:
-        cmd = 'cd %s;%s' % (cwd, cmd)
-
-    with settings(cwd=''):
-        for h in env.hosts:
-            try:
-                # catch the port number to pass to ssh
-                host, port = h.split(':')
-                local('ssh -p %s -A %s@%s "%s"' % (port, env.user, host, cmd), capture=capture)
-            except ValueError:
-                local('ssh -A %s@%s "%s"' % (env.user, h, cmd), capture=capture)
+# to enable ssh key forwarding
+env.forward_agent = True
 
 @task
 def dev():
@@ -65,22 +44,6 @@ def production():
 def test():
     env.name = 'production'
     env.hosts = ENVIRONMENTS[env.name]
-
-# @task
-# def configure_db():
-#     if env.name == 'dev':
-#         from sh import createuser, createdb
-#         #todo untested
-#         createuser("-Upostgres -d -R -S %s" % PRJ_DB_USER)
-#         createdb ("-Upostgres -O%s %s" % PRJ_USER, PRJ_DB)
-#     else:
-#         require.postgres.server()
-#         require.postgres.user(PRJ_USER, PRJ_PASS)
-#         require.postgres.database(PRJ_DB, PRJ_USER)
-
-@task
-def setup():
-    configure_db()
 
 
 @task
@@ -141,7 +104,7 @@ def project_setup():
     # Clono, se non e' gia stato clonato il progetto
     with cd("/home/django/"):
         if not exists(PRJ_NAME):
-            sshagent_run('git clone %s %s' % (PRJ_GIT_REPO, PRJ_NAME))
+            run('git clone %s %s' % (PRJ_GIT_REPO, PRJ_NAME))
 
         with prefix('workon %s' % PRJ_NAME):
             # Aggiungo all'ambiente virtuale la directory base del progetto e la directory apps
@@ -172,11 +135,9 @@ def project_setup():
     with cd("/home/django/%s/" % PRJ_NAME):
         run("touch .env")
         append(".env", "PRJ_ENV=%s" % env.name)
-        append(".env", "PRJ_ENGINE=postgresql_psycopg2")
-        append(".env", "PRJ_NAME=%s" % PRJ_NAME)
-        append(".env", "PRJ_DB=%s" % PRJ_DB)
-        append(".env", "PRJ_USER=%s" % PRJ_USER)
-        append(".env", "PRJ_PASS=%s" % PRJ_PASS)
+        append(".env", "PRJ_DB_NAME=%s" % remote_db_name)
+        append(".env", "PRJ_DB_USER=%s" % remote_db_user)
+        append(".env", "PRJ_DB_PASSWORD=%s" % remote_db_pass)
         append(".env", 'PRJ_SECRET_KEY="%s"' % "".join([random.choice(
                              "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_+)") for i in range(50)]))
 
@@ -205,11 +166,12 @@ def project_setup():
     run("supervisorctl reload")
     run("/etc/init.d/nginx reload")
 
+
 @task
 def update():
     # Clono, se non e' gia stato clonato il progetto
     with cd("/home/django/%s" % PRJ_NAME):
-        sshagent_run("git pull")
+        run("git pull")
         with prefix('workon %s' % PRJ_NAME):
             run("pip install -r requirements/%s.txt" % env.name)
             run("python website/manage.py migrate")
@@ -217,11 +179,19 @@ def update():
     env.user = 'root'
     run('supervisorctl reload')
 
+
 @task
 def reload_server():
     env.user = 'root'
     run('/etc/init.d/nginx reload')
     run('supervisorctl reload')
+
+
+@task
+def reload_supervisor():
+    env.user = 'root'
+    run('supervisorctl reload')
+
 
 @task
 def restart_server():
