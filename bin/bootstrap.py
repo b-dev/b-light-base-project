@@ -26,15 +26,15 @@ if __name__ == '__main__':
     PRJ_NAME = REPO_NAME
     PRJ_ROOT = REPO_ROOT.replace(REPO_NAME, PRJ_NAME)
 
-    PRJ_DB_NAME = raw_input(u"db name for the project db ? (defaults to project name) \n")
+    PRJ_DB_NAME = raw_input(u"db name for the project local db ? (defaults to project name) \n")
     if len(PRJ_DB_NAME.strip()) == 0:
         PRJ_DB_NAME = PRJ_NAME
 
-    PRJ_DB_USER = raw_input(u"username for the project db ? (defaults to db name) \n")
+    PRJ_DB_USER = raw_input(u"username for the project local db ? (defaults to db name) \n")
     if len(PRJ_DB_USER.strip()) == 0:
         PRJ_DB_USER = PRJ_DB_NAME
 
-    PRJ_DB_PASSWORD = getpass.getpass(u"password for the project db ? (defaults to username) \n")
+    PRJ_DB_PASSWORD = getpass.getpass(u"password for the project local db ? (defaults to username) \n")
     if len(PRJ_DB_PASSWORD.strip()) == 0:
         PRJ_DB_PASSWORD = PRJ_DB_USER
 
@@ -43,27 +43,11 @@ if __name__ == '__main__':
         process = subprocess.Popen('export PGPASSWORD=%s && createdb -U %s -h localhost %s' % (PRJ_DB_PASSWORD, PRJ_DB_USER, PRJ_DB_NAME,),
                                    shell=True, executable="/bin/bash")
 
-    PRJ_ADDR_STAGING = raw_input(u"staging server address ? (can be left empty and filled in the .env file later) \n")
-    if len(PRJ_ADDR_STAGING.strip()) == 0:
-        PRJ_ADDR_STAGING = ''
-
-    PRJ_ADDR_PRODUCTION = raw_input(u"production server address ? (can be left empty and filled in the .env file later) \n")
-    if len(PRJ_ADDR_PRODUCTION.strip()) == 0:
-        PRJ_ADDR_PRODUCTION = ''
-
-    PRJ_ADDR_TEST = raw_input(u"test server address ? (can be left empty and filled in the .env file later) \n")
-    if len(PRJ_ADDR_TEST.strip()) == 0:
-        PRJ_ADDR_TEST = ''
-
-    PRJ_ENABLE_CMS = raw_input(u"you want cms module enabled ? (y/n) \n")
-    FLAG_ENABLE_CMS = 'FALSE'
-    if PRJ_ENABLE_CMS in ('y', 'yes', 'Y', 'YES'):
-        FLAG_ENABLE_CMS = 'TRUE'
-
     _replace_in_file(PRJ_ROOT, 'etc/gunicorn.sh', {'%%PRJ_NAME%%': PRJ_NAME})
     _replace_in_file(PRJ_ROOT, 'etc/nginx.conf', {'%%PRJ_NAME%%': PRJ_NAME})
     _replace_in_file(PRJ_ROOT, 'etc/supervisor.conf', {'%%PRJ_NAME%%': PRJ_NAME})
-    _replace_in_file(PRJ_ROOT, 'website/settings/base.py', {'%%PRJ_NAME%%': PRJ_NAME,})
+    _replace_in_file(PRJ_ROOT, 'fabfile.py', {'%%PRJ_NAME%%': PRJ_NAME})
+    _replace_in_file(PRJ_ROOT, 'website/settings/base.py', {'%%PRJ_NAME%%': PRJ_NAME})
 
     env_file_lines = [
         'export PRJ_ENV=%s' % PRJ_ENV,
@@ -95,6 +79,7 @@ if __name__ == '__main__':
             while process.poll() == None: pass
         subprocess.Popen('cd %s && git add .' % PRJ_ROOT, shell=True, executable="/bin/bash")
 
-    env_file_lines.append('\nexport PRJ_GIT_REPO=%s' % PRJ_GIT_REPO)
+        env_file_lines.append('\nexport PRJ_GIT_REPO=%s' % PRJ_GIT_REPO)
+
     with open(os.path.join(REPO_ROOT, '.env'), 'w') as env_file:
         env_file.writelines(env_file_lines)
