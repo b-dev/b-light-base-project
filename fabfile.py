@@ -72,7 +72,7 @@ def plug_prerequisites(name):
 
 @task
 def plug(name):
-    # TODO : da riabilitare perche' mi da errore che non trova fabtools (e non voglio installarlo globalmente)
+    # TODO : da riabilitare. Disabilitato perche' mi da errore che non trova fabtools (e non voglio installarlo globalmente)
     # plug_prerequisites(name)
 
     with prefix(". /usr/local/bin/virtualenvwrapper.sh; workon %s" % PRJ_NAME):
@@ -91,6 +91,7 @@ def plug(name):
         if app_enabled:
             new_settings = open(os.path.join(PROJECT_ROOT, 'website', 'settings', 'base.py'), 'w')
             new_settings.writelines(lines)
+            new_settings.close()
 
         local("python %s/website/manage.py syncdb --all" % PROJECT_ROOT)
         local("python %s/website/manage.py migrate --fake" % PROJECT_ROOT)
