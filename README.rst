@@ -44,8 +44,8 @@ To enable these apps run the following command:
 
 ::
 
-    fab plug cms # to enable the CMS apps
-    fab plug webapp # to enable the WEBAPP apps
+    fab plug:cms # to enable the CMS apps
+    fab plug:webapp # to enable the WEBAPP apps
 
 Now you can run "runserver" and browse yoour app :-)
 
