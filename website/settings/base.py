@@ -17,6 +17,8 @@ PRJ_ENV = os.environ['PRJ_ENV']
 PRJ_ENABLE_CMS = False
 PRJ_ENABLE_WEBAPP = False
 
+DEPLOY_ON_HEROKU = False
+
 # Site name:
 SITE_NAME = os.path.basename(PROJECT_ROOT)
 ########## END PATH CONFIGURATION
@@ -48,13 +50,22 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['PRJ_DB_NAME'],
-        'USER': os.environ['PRJ_DB_USER'],
-        'PASSWORD': os.environ['PRJ_DB_PASSWORD'],
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '',
     }
 }
+if DEPLOY_ON_HEROKU:
+    # Parse database configuration from $DATABASE_URL
+    import dj_database_url
+    DATABASES['default'] = dj_database_url.config()
+else:
+    DATABASES['default']['NAME'] = os.environ['PRJ_DB_NAME']
+    DATABASES['default']['USER'] = os.environ['PRJ_DB_USER']
+    DATABASES['default']['PASSWORD'] = os.environ['PRJ_DB_PASSWORD']
+
 ########## END DATABASE CONFIGURATION
 
 
@@ -297,6 +308,8 @@ DBBACKUP_DROPBOX_DIRECTORY = '%%PRJ_NAME%%'
 DBBACKUP_MEDIA_PATH = MEDIA_ROOT
 DBBACKUP_CLEANUP_KEEP = 3
 ########## END BACKUP CONFIGURATION
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Import custom extra apps settings
 if PRJ_ENABLE_CMS:

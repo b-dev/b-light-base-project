@@ -31,3 +31,5 @@ django-extensions
 line_profiler==1.0b3
 
 gunicorn
+dj-database-url
+dj-static

@@ -4,7 +4,7 @@ import sys
 import site
 
 if __name__ == "__main__":
-    repo_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    repo_path = os.path.dirname(os.path.abspath(__file__))
     site.addsitedir(repo_path)
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "website.settings")
 

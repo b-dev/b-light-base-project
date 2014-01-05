@@ -3,22 +3,9 @@ from os import environ
 
 from base import *
 
-# Normally you should not import ANYTHING from Django directly
-# into your settings, but ImproperlyConfigured is an exception.
-from django.core.exceptions import ImproperlyConfigured
-
-
-def get_env_setting(setting):
-    """ Get the environment setting or return exception """
-    try:
-        return environ[setting]
-    except KeyError:
-        error_msg = "Set the %s env variable" % setting
-        raise ImproperlyConfigured(error_msg)
-
 ########## HOST CONFIGURATION
 # See: https://docs.djangoproject.com/en/1.5/releases/1.5/#allowed-hosts-required-in-production
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 ########## END HOST CONFIGURATION
 
 ########## EMAIL CONFIGURATION
@@ -46,20 +33,6 @@ EMAIL_USE_TLS = True
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = EMAIL_HOST_USER
 ########## END EMAIL CONFIGURATION
-
-########## DATABASE CONFIGURATION
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.%s' % PRJ_ENGINE,
-        'NAME': PRJ_DB,
-        'USER': PRJ_USER,
-        'PASSWORD': PRJ_PASS,
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
-########## END DATABASE CONFIGURATION
-
 
 ########## CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches

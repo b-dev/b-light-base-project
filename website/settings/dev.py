@@ -3,6 +3,16 @@ from os.path import join, normpath
 
 from base import *
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ['PRJ_DB_NAME'],
+        'USER': os.environ['PRJ_DB_USER'],
+        'PASSWORD': os.environ['PRJ_DB_PASSWORD'],
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 ########## DEBUG CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
