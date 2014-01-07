@@ -14,10 +14,14 @@ urlpatterns = patterns('',
 )
 
 if settings.DEBUG:
-    import debug_toolbar
     urlpatterns = patterns('',
-        url(r'^__debug__/', include(debug_toolbar.urls)),
         url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
         url(r'', include('django.contrib.staticfiles.urls')),
     ) + urlpatterns
+
+    if 'debug_toolbar' in settings.INSTALLED_APPS:
+        import debug_toolbar
+        urlpatterns = patterns('',
+            url(r'^__debug__/', include(debug_toolbar.urls)),
+        ) + urlpatterns
