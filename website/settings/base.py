@@ -74,7 +74,10 @@ else:
 TIME_ZONE = 'Europe/Rome'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = 'it-it'
+LANGUAGE_CODE = 'it'
+LANGUAGES = (
+    ('it', 'Italiano'),
+)
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
