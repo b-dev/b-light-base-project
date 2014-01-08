@@ -93,8 +93,8 @@ def plug(name):
             new_settings.writelines(lines)
             new_settings.close()
 
-        local("python %s/website/manage.py syncdb --all" % PROJECT_ROOT)
-        local("python %s/website/manage.py migrate --fake" % PROJECT_ROOT)
+        local("python %s/manage.py syncdb --all" % PROJECT_ROOT)
+        local("python %s/manage.py migrate --fake" % PROJECT_ROOT)
 
 
 @task
