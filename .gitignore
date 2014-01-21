@@ -18,6 +18,9 @@ build
 *.log
 logs
 
+# Media
+website/media
+
 .env
 .vagrant
 .idea
