@@ -49,7 +49,7 @@ def test():
 @task
 def bower():
     from sh import bower
-    pah = os.path.join(PROJECT_ROOT, 'requirements', 'clientside.txt')
+    pah = os.path.join(PROJECT_ROOT, 'requirements', 'front_base.txt')
     with open(pah, 'r') as reqfile:
         for line in reqfile:
             bower.install(line.strip())
