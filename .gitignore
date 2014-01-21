@@ -21,6 +21,9 @@ logs
 # Media
 website/media
 
+# Bower assets
+website/static/bower
+
 .env
 .vagrant
 .idea
