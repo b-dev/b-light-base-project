@@ -12,6 +12,52 @@ A complete skeleton for Django projects, using:
 Project also have a configuration to use Vagrant (1.2.2) on VirtualBox (4.2.12) during development, tested with PyCharm on Ubuntu and MacOSX.
 Deployment is made with Gunicorn and Nginx.
 
+==================================
+Initial Server Setup
+==================================
+
+Follow these step to install all required package: ::
+
+
+    apt-get -y update
+    apt-get -y install nginx postgresql libpq-dev python-dev gcc make python-setuptools libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev mercurial subversion git supervisor
+
+    # SE SI HANNO PROBLEMI CON PIL PERCHE NON INSTALLA IL SUPPORTO AL JPEG (TENDENZIALMENTE IL PROBLEMA SI HA CON LE VERSIONI A 64 BIT) CREARE I SEGUENTI LINK SIMBOLICI:
+    # ln -s /usr/lib/x86_64-linux-gnu/libjpeg.so /usr/lib
+    # ln -s /usr/lib/x86_64-linux-gnu/libfreetype.so /usr/lib
+    # ln -s /usr/lib/x86_64-linux-gnu/libz.so /usr/lib
+
+    # Create postgres user 'django'
+    su postgres -c "createuser -P django"
+
+    ### VIRTUALENV ###
+    easy_install elementtree
+    easy_install pip
+    pip install virtualenv
+    pip install virtualenvwrapper
+
+    ## CREATE DJANGO USER ##
+    useradd -d /home/django -m -r django
+    passwd django
+
+    ## THIS STEP MUST BE DONE WITH django USER
+    su - django
+
+    # Open /home/django/.bashrc file and add this 3 lines at the bottom of the files:
+    export WORKON_HOME=$HOME/.virtualenvs
+    source /usr/local/bin/virtualenvwrapper.sh
+    export DJANGO_ENVIRONMENT=production
+
+    mkdir /home/django/.virtualenvs
+
+    # open (or create if not exists) /home/django/.bash_profile and add these lines:
+    if [ -f "$HOME/.bashrc" ]; then
+        . "$HOME/.bashrc"
+    fi
+    export WORKON_HOME=$HOME/.virtualenvs
+    source /usr/local/bin/virtualenvwrapper.sh
+    export DJANGO_ENVIRONMENT=production
+
 
 ==================================
 Local Development without Vagrant

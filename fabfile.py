@@ -174,9 +174,9 @@ def update():
     with cd("/home/django/%s" % PRJ_NAME):
         run("git pull")
         with prefix('workon %s' % PRJ_NAME):
-            run("pip install -r requirements/%s.txt" % env.name)
-            run("python website/manage.py migrate")
-            run("python website/manage.py collectstatic --noinput")
+            run("pip install -r requirements.txt")
+            run("python manage.py migrate")
+            run("python manage.py collectstatic --noinput")
     env.user = 'root'
     run('supervisorctl reload')
 
