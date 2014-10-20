@@ -21,6 +21,7 @@ Follow these step to install all required package: ::
 
     apt-get -y update
     apt-get -y install nginx postgresql libpq-dev python-dev gcc make python-setuptools libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev mercurial subversion git supervisor
+    apt-get -y install libxml2-dev libxslt-dev
 
     # SE SI HANNO PROBLEMI CON PIL PERCHE NON INSTALLA IL SUPPORTO AL JPEG (TENDENZIALMENTE IL PROBLEMA SI HA CON LE VERSIONI A 64 BIT) CREARE I SEGUENTI LINK SIMBOLICI:
     # ln -s /usr/lib/x86_64-linux-gnu/libjpeg.so /usr/lib
